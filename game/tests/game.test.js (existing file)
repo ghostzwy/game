@@ -1,0 +1,16 @@
+jest.config.js:
+{
+    "testEnvironment": "jsdom"
+}
+
+tests/game.test.js:
+test('background music element exists', () => {
+    document.body.innerHTML = '<audio id="bgMusic"></audio>';
+    const audioManager = {
+        backgroundMusic: document.getElementById('bgMusic'),
+        playBackgroundMusic() {
+            this.backgroundMusic.play().catch(error => console.log('Audio playback prevented:', error));
+        }
+    };
+    expect(audioManager.backgroundMusic).toBeDefined();
+});

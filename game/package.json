@@ -1,0 +1,63 @@
+{
+  "name": "disaster-prep-game",
+  "version": "1.0.0",
+  "description": "Game simulasi kesiapsiagaan bencana yang edukatif",
+  "main": "src/js/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "http-server . -p 8080 -c-1 -o /src/html/index.html -a 0.0.0.0",
+    "test": "jest --verbose",
+    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "build": "babel src -d dist"
+  },
+  "dependencies": {
+    "howler": "^2.2.3",
+    "http-server": "^14.1.1",
+    "jquery": "^3.6.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.15.0",
+    "@babel/core": "^7.15.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6",
+    "jest-environment-jsdom": "^27.0.6"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!@babel)"
+    ],
+    "verbose": true,
+    "testTimeout": 10000,
+    "collectCoverage": true,
+    "coverageDirectory": "coverage"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ],
+    "plugins": [
+      "@babel/plugin-transform-modules-commonjs"
+    ]
+  },
+  "author": "danang & fahri",
+  "license": "MIT"
+}
