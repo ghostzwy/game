@@ -2,7 +2,7 @@
   "presets": [
     ["@babel/preset-env", {
       "targets": {
-        "node": "current"
+        "node": "18" // Vercel default Node.js LTS (per 2024)
       }
     }]
   ],
