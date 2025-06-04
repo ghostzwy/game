@@ -3,8 +3,5 @@
     { "source": "/", "destination": "/index.html" },
     { "source": "/ruang2", "destination": "/ruang2.html" }
   ],
-  "cleanUrls": true,
-  "static": {
-    "public": "."
-  }
+  "cleanUrls": true
 }
