@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="id">
+    <title>Bedroom - Siaga Bersama Dira</title>
+    <link rel="stylesheet" href="/src/css/ruang2.css">
+</head>
+<body>
+<div class="game-container">
+    <div id="portrait-warning" class="portrait-warning hidden">
+        <div class="icon">🔄</div>
+        <div>Silakan putar perangkat Anda ke mode <b>landscape</b> untuk bermain!</div>
+    </div>
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading...</div>
+    </div>
+    <div class="background bedroom-bg active"></div>
+    <div class="background open-bg"></div>
+    <div class="open-message" style="display:none;">kita harus segera keluar untuk mengevakuasi barang</div>
+    <div class="background lose-bg">
+        <div class="lose-message" style="display:none;">yahh aku tidak sempat mengambil barang di rumah!!</div>
+    </div>  
+    <div class="background win-bg">
+        <div class="win-message" style="display:block;">Alhamdulillah semua barang berhasil diselamatkan!!</div>
+        <a href="/index.html"><button class="retry-button" style="display:block;">Mau Main Lagi?</button></a>
+    </div>
+    <div id="game-screen" class="screen">
+        <div class="hud">
+            <div id="timer">⏱️ Waktu: <span>30</span></div>
+            <div id="collected-items">🎒 Barang: <span>0</span></div>
+        </div>
+        <div id="game-area" class="room2">
+            <div class="item-hidden item-room2" data-name="Handphone" style="top: 60%; left: 12% ;">📱</div>
+            <div class="item-hidden item-room2" data-name="Buku" style="top: 50%; left: 60%;">📖</div>
+            <div class="item-hidden item-room2" data-name="Kacamata" style="top: 40%; left: 30%;">👓</div>
+            <div class="item-hidden item-room2" data-name="Dompet" style="top: 60%; left: 50%;">👛</div>
+            <div class="item-hidden item-room2" data-name="Kunci" style="top: 30%; left: 70%;">🔑</div>
+            <div id="items-container-room2" class="items-container">
+                <div class="item-inventory" data-name="Handphone">📱</div>
+                <div class="item-inventory" data-name="Buku">📖</div>
+                <div class="item-inventory" data-name="Kacamata">👓</div>
+                <div class="item-inventory" data-name="Dompet">👛</div>
+                <div class="item-inventory" data-name="Kunci">🔑</div>
+            </div>
+            <div id="area-navigation" class="area-navigation">
+                <button id="arrow-left" class="arrow-btn">⬅️</button>
+            </div>
+        </div>
+    </div>
+    <div id="instruction" class="instruction hidden">
+        <div class="instruction-container">
+            <span id="instruction-text"></span>
+        </div>
+        <div id="instruction-next" class="hidden">Next &gt;</div>
+    </div>
+    <div id="audio-container">
+        <audio id="bgMusic" loop preload="auto" autoplay>
+            <source src="/src/assets/audio/sea.mp3" type="audio/mp3">
+        </audio>
+        <audio id="collectSound" preload="auto">
+            <source src="/src/assets/audio/8bit-coin-sound-effect.mp3" type="audio/mp3">
+        </audio>
+        <audio id="winSound" preload="auto">
+            <source src="/src/assets/audio/success-1-6297.mp3" type="audio/mp3">
+        </audio>
+        <audio id="loseSound" preload="auto">
+            <source src="/src/assets/audio/game-over-38511.mp3" type="audio/mp3">
+        </audio>
+    </div>
+</div>
+<script type="module" src="/src/js/ruang2.js"></script>
+<script src="/src/js/sound.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+    const bgMusic = document.getElementById('bgMusic');
+    bgMusic.volume = 0.3;
+    bgMusic.play().catch(function(error) {
+        console.log("Audio play failed:", error);
+    });
+});
+
+function updatePortraitWarning() {
+    const warning = document.getElementById('portrait-warning');
+    if (window.innerWidth < window.innerHeight) {
+        warning.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    } else {
+        warning.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+}
+window.addEventListener('DOMContentLoaded', updatePortraitWarning);
+window.addEventListener('resize', updatePortraitWarning);
+window.addEventListener('orientationchange', () => setTimeout(updatePortraitWarning, 100));
+</script>
+</body>
+</html>
