@@ -6,7 +6,7 @@
     <meta name="google" content="notranslate">
     <meta http-equiv="Content-Language" content="id">
     <title>Siaga Bersama Dira</title>
-    <link rel="stylesheet" href="/game/src/css/styles.css">
+    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -123,26 +123,6 @@
             <div id="transition-overlay" class="fade-out hidden"></div>
         </div>
     </div>
-    <script type="module" src="/game/src/js/index.js"></script>
-    <script src="/game/src/js/sound.js"></script>
-    <script src="/game/src/js/orientation.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', function() {
-            const bgMusic = document.getElementById('bgMusic');
-            const startBtn = document.getElementById('start-btn');
-            const startGameSound = document.getElementById('startGameSound');
-            
-            bgMusic.volume = 0.3;
-            bgMusic.play().catch(function(error) {
-                console.log("Audio play failed:", error);
-            });
-
-            startBtn.addEventListener('click', function() {
-                startGameSound.play().catch(function(error) {
-                    console.log("Start game sound failed:", error);
-                });
-            });
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
