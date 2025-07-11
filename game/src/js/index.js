@@ -456,24 +456,31 @@ function isMobileDevice() {
 
 // Ubah fungsi checkOrientation
 function checkOrientation() {
+    // Debug log
+    console.log('checkOrientation called');
     const warning = document.getElementById('orientation-warning');
+    const landscapeWarning = document.getElementById('landscape-warning');
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
-    // Ganti deteksi mobile
     const isMobile = isMobileDevice();
     const isPortrait = window.innerWidth < window.innerHeight;
     if (typeof window.__hasStartedGame === 'undefined') {
         window.__hasStartedGame = false;
     }
     if (isMobile && isPortrait) {
+        // Tampilkan warning landscape
         if (warning) warning.classList.remove('hidden');
+        if (landscapeWarning) landscapeWarning.classList.remove('hidden');
         if (startScreen) startScreen.style.visibility = 'hidden';
         if (gameScreen) gameScreen.style.visibility = 'hidden';
         if (endScreen) endScreen.style.visibility = 'hidden';
         document.body.style.overflow = 'hidden';
+        console.log('Mobile portrait: show landscape warning');
     } else {
+        // Sembunyikan warning landscape
         if (warning) warning.classList.add('hidden');
+        if (landscapeWarning) landscapeWarning.classList.add('hidden');
         if (!window.__hasStartedGame) {
             if (startScreen) {
                 startScreen.classList.remove('hidden');
@@ -489,6 +496,7 @@ function checkOrientation() {
             else if (endScreen) endScreen.style.visibility = 'hidden';
         }
         document.body.style.overflow = '';
+        console.log('Landscape or desktop: hide landscape warning');
     }
 }
 
@@ -561,9 +569,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 500);
     });
-    window.addEventListener('DOMContentLoaded', handleOrientationWarning);
-    window.addEventListener('resize', handleOrientationWarning);
-    window.addEventListener('orientationchange', () => setTimeout(handleOrientationWarning, 100));
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded event');
+        checkOrientation();
+    });
+    window.addEventListener('resize', () => {
+        console.log('resize event');
+        checkOrientation();
+    });
+    window.addEventListener('orientationchange', () => {
+        console.log('orientationchange event');
+        setTimeout(checkOrientation, 100);
+    });
 });
 function showLoseBackground() {
     const loseBg = document.querySelector('.background.lose-bg');
