@@ -704,6 +704,94 @@ button:active {
     100% { transform: rotate(90deg); }
 }
 
-.hidden {
-    display: none !important;
+/* Room 2 styles from ruang2.css */
+/* --- Room 2 --- */
+#items-container-ruang2.items-container {
+    /* Styles for Room 2 inventory bar */
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 10;
+    backdrop-filter: blur(5px);
+}
+.item-inventory.found {
+    opacity: 0.3;
+}
+.item-hidden.item-ruang2 {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    font-size: 2.2em;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+.item-hidden.item-ruang2.found {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.3);
+}
+.item-hidden.item-ruang2[data-name="Handphone"] { top: 20%; left: 20%; }
+.item-hidden.item-ruang2[data-name="Buku"] { top: 50%; left: 60%; }
+.item-hidden.item-ruang2[data-name="Kacamata"] { top: 40%; left: 30%; }
+.item-hidden.item-ruang2[data-name="Dompet"] { top: 60%; left: 50%; }
+.item-hidden.item-ruang2[data-name="Kunci"] { top: 30%; left: 70%; }
+#background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    transition: background-image 0.5s ease;
+}
+.ruang-label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 1.1em;
+    color: #333;
+}
+.transition-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0;
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.7s cubic-bezier(.4,0,.2,1);
+}
+
+.transition-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+.ruang3-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%;
+    height: 100%;
+    /* Ganti background agar terang, misal pakai gambar open.jpg tanpa filter gelap */
+    background: url('../assets/images/open.jpg') center center/cover no-repeat;
+    z-index: 1;
+    display: block;
+
+}   
+.ruang3-bg.hidden {
+    display: block;
 }

@@ -27,6 +27,8 @@
             </div>
         </div>
         <div id="game-screen" class="screen hidden">
+            <!-- Add background div -->
+            <div id="background"></div>
             <div id="instruction" class="instruction hidden">
                 <span id="instruction-text"></span>
                 <span id="instruction-next" class="hidden">Next &gt;</span>
@@ -42,6 +44,7 @@
                 <div id="collected-items">🎒 Barang: <span>0</span></div>
             </div>
             
+            <!-- RUANG 1 -->
             <div id="items-container-ruang1" class="items-container">
                 <div class="item-inventory" data-name="Tas">🎒</div>
                 <div class="item-inventory" data-name="Air">💧</div>
@@ -50,6 +53,7 @@
                 <div class="item-inventory" data-name="Makanan">🍎</div>
             </div>
             
+            <!-- RUANG 2 -->
             <div id="items-container-ruang2" class="items-container hidden">
                 <div class="item-inventory" data-name="Handphone">📱</div>
                 <div class="item-inventory" data-name="Buku">📖</div>
@@ -66,18 +70,24 @@
             <div id="game-area">
                 <div id="character"></div>
                 
+                <!-- Room 1 items -->
                 <div class="item-hidden item-ruang1" data-name="Tas" style="top: 18%; left: 12%;">🎒</div>
                 <div class="item-hidden item-ruang1" data-name="Air" style="top: 60%; left: 70%;">💧</div>
                 <div class="item-hidden item-ruang1" data-name="P3K" style="top: 40%; left: 40%;">🏥</div>
                 <div class="item-hidden item-ruang1" data-name="Senter" style="top: 60%; left: 25%;">🔦</div>
                 <div class="item-hidden item-ruang1" data-name="Makanan" style="top: 30%; left: 80%;">🍎</div>
                 
-                <div class="item-hidden item-ruang2 hidden" data-name="Handphone" style="top: 20%; left: 20%;">📱</div>
+                <!-- Room 2 items, initially hidden -->
+                <div class="item-hidden item-ruang2 hidden" data-name="Handphone" style="top: 30%; left: 20%;">📱</div>
                 <div class="item-hidden item-ruang2 hidden" data-name="Buku" style="top: 50%; left: 60%;">📖</div>
                 <div class="item-hidden item-ruang2 hidden" data-name="Kacamata" style="top: 40%; left: 30%;">👓</div>
                 <div class="item-hidden item-ruang2 hidden" data-name="Dompet" style="top: 60%; left: 50%;">👛</div>
                 <div class="item-hidden item-ruang2 hidden" data-name="Kunci" style="top: 30%; left: 70%;">🔑</div>
+                 
+                <!-- Room 3 background (sesi 3) -->
+                <div id="ruang3-bg" class="ruang3-bg hidden"></div>
             </div>
+            <div id="transition-overlay" class="transition-overlay hidden"></div>
         </div>
         <div id="end-screen" class="screen hidden">
             <div class="content-wrapper">
