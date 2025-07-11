@@ -1,5 +1,5 @@
 {
-  "name": "disaster-prep-game",
+  "name": "game",
   "version": "1.0.0",
   "description": "Game simulasi kesiapsiagaan bencana yang edukatif",
   "main": "src/js/index.js",
@@ -8,7 +8,7 @@
     "start": "http-server . -p 8080 -c-1 -o /src/html/index.html -a 0.0.0.0",
     "test": "jest --verbose",
     "debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
-    "build": "babel src -d dist"
+    "build": "vite build"
   },
   "dependencies": {
     "howler": "^2.2.3",
@@ -22,7 +22,8 @@
     "@babel/preset-env": "^7.15.0",
     "babel-jest": "^27.0.6",
     "jest": "^27.0.6",
-    "jest-environment-jsdom": "^27.0.6"
+    "jest-environment-jsdom": "^27.0.6",
+    "vite": "^2.6.4"
   },
   "jest": {
     "testEnvironment": "jsdom",
