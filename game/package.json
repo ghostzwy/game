@@ -2,17 +2,13 @@
   "name": "game",
   "version": "1.0.0",
   "description": "Game simulasi kesiapsiagaan bencana yang edukatif",
-  "main": "src/js/index.js",
-  "type": "module",
   "scripts": {
-    "start": "http-server . -p 8080 -c-1 -o /src/html/index.html -a 0.0.0.0",
+    "build": "vite build",
     "test": "jest --verbose",
-    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
-    "build": "vite build"
+    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
     "howler": "^2.2.3",
-    "http-server": "^14.1.1",
     "jquery": "^3.6.0"
   },
   "devDependencies": {
