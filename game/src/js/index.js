@@ -1,4 +1,4 @@
-import soundManager from '/src/js/sound.js';
+import soundManager from '/game/src/js/sound.js';
 
 function checkLandscape() {
     const warning = document.getElementById('landscape-warning');
@@ -147,28 +147,27 @@ class Game {
 
     gotoRuang2() {
         // Ganti background ke bedroom.png
-        changeBackground('/src/assets/images/bedroom.png');
-        
+        changeBackground('/game/src/assets/images/bedroom.png');
         // Sembunyikan item ruang1
         document.querySelectorAll('.item-ruang1').forEach(item => {
             item.classList.add('hidden');
             item.style.display = 'none';
         });
         document.getElementById('items-container-ruang1')?.classList.add('hidden');
-        
-        // Tampilkan item ruang2
         document.querySelectorAll('.item-ruang2').forEach(item => {
             item.classList.remove('hidden');
             item.style.display = '';
+            item.style.pointerEvents = 'auto';
         });
         document.getElementById('items-container-ruang2')?.classList.remove('hidden');
-        
-        // Update area aktif
         this.currentArea = 1;
-        
-        // Reset pointer events untuk item ruang2
+        // Hapus event lama dan bind ulang agar klik berfungsi
         document.querySelectorAll('.item-ruang2').forEach(item => {
-            item.style.pointerEvents = 'auto';
+            // Remove all previous event listeners by replacing node
+            const newItem = item.cloneNode(true);
+            item.parentNode.replaceChild(newItem, item);
+            newItem.style.pointerEvents = 'auto';
+            newItem.addEventListener('click', () => this.collectItem(newItem));
         });
     }
     
@@ -182,7 +181,7 @@ class Game {
         // Tampilkan background ruang3
         document.getElementById('ruang3-bg')?.classList.remove('hidden');
         // Ganti background jika perlu
-        changeBackground('/src/assets/images/open.jpg');
+        changeBackground('/game/src/assets/images/open.jpg');
         // Tampilkan instruksi ruang3
         this.showTypingInstruction(
             'Kamu sudah sampai di luar rumah dengan semua barang penting. Tunggu bantuan datang di tempat aman!',
@@ -205,10 +204,17 @@ class Game {
         if (!instruction || !instructionTextEl || !roomArrow || !instructionNext) return;
         instruction.classList.remove('hidden');
         instructionTextEl.textContent = '';
-        roomArrow.classList.add('hidden');
+        // Arrow custom: gunakan SVG inline agar lebih "game" dan modern
+        roomArrow.innerHTML = `
+        <svg width="48" height="48" viewBox="0 0 48 48" style="vertical-align:middle;">
+            <circle cx="24" cy="24" r="22" fill="#27ae60" stroke="#fff" stroke-width="3"/>
+            <polyline points="18,14 30,24 18,34" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        `;
+        roomArrow.classList.remove('hidden');
         instructionNext.classList.add('hidden');
         instruction.style.pointerEvents = 'none';
-        this.isRunning = false; // Pause timer when instruction is shown
+        this.isRunning = false;
         let i = 0;
         const typeNext = () => {
             if (i < instructionText.length) {
@@ -220,20 +226,27 @@ class Game {
                 setTimeout(typeNext, 60);
             } else {
                 roomArrow.classList.remove('hidden');
-                instructionNext.classList.remove('hidden');
                 instruction.style.pointerEvents = 'auto';
-                const handleClick = () => {
+                roomArrow.onclick = () => {
                     soundManager.play('click');
-                    instruction.classList.add('hidden');
-                    instructionTextEl.textContent = '';
-                    instructionNext.classList.add('hidden');
-                    roomArrow.classList.add('hidden');
-                    if (typeof callback === 'function') callback();
+                    const gameScreen = document.getElementById('game-screen');
+                    if (gameScreen) {
+                        gameScreen.classList.add('area-slide-right');
+                        setTimeout(() => {
+                            gameScreen.classList.remove('area-slide-right');
+                            instruction.classList.add('hidden');
+                            instructionTextEl.textContent = '';
+                            roomArrow.classList.add('hidden');
+                            if (typeof callback === 'function') callback();
+                        }, 500);
+                    } else {
+                        instruction.classList.add('hidden');
+                        instructionTextEl.textContent = '';
+                        roomArrow.classList.add('hidden');
+                        if (typeof callback === 'function') callback();
+                    }
                 };
-                instructionTextEl.onclick = handleClick;
-                roomArrow.onclick = handleClick;
-                instructionNext.onclick = handleClick;
-                instruction.onclick = handleClick;
+                instruction.onclick = roomArrow.onclick;
             }
         };
         typeNext();
@@ -668,7 +681,7 @@ function checkAllItemsCollected() {
     // collectedItems adalah array nama item yang sudah dikumpulkan
     if (typeof itemsRuang1 !== 'undefined' && typeof collectedItems !== 'undefined') {
         if (itemsRuang1.every(item => collectedItems.includes(item))) {
-            changeBackground('/src/assets/images/bedroom.png');
+            changeBackground('/game/src/assets/images/bedroom.png');
         }
     }
 }
@@ -687,11 +700,11 @@ function onItemCollected(itemName) {
 function changeBackground(imageName) {
     const bg = document.getElementById('background');
     if (bg) {
-        bg.style.backgroundImage = `url('${imageName}')`;
+        bg.style.backgroundImage = `url('/game${imageName.replace(/^\/game/, "")}')`;
     } else {
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = `url('${imageName}')`;
+            gameScreen.style.backgroundImage = `url('/game${imageName.replace(/^\/game/, "")}')`;
             gameScreen.style.backgroundSize = 'cover';
         }
     }
@@ -714,4 +727,5 @@ function showRoomTransition(callback) {
             }, 700);
         }, 400); // waktu overlay tetap hitam sebelum fade out
     }, 700); // waktu fade in
+
 }
