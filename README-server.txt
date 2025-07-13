@@ -1,4 +1,4 @@
-Untuk menjalankan server lokal agar file HTML/JS/CSS bisa diakses dengan benar, gunakan salah satu cara berikut:
+ Untuk menjalankan server lokal agar file HTML/JS/CSS bisa diakses dengan benar, gunakan salah satu cara berikut:
 
 **1. Dengan Python (paling mudah, tidak perlu install tambahan jika sudah ada Python):**
 - Buka terminal/cmd di folder `c:\Users\danan\Downloads\New folder`

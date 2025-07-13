@@ -26,7 +26,7 @@ body {
     transition: all 0.5s ease-in-out;
 }
 #start-screen {
-    background: url('../assets/images/open.jpg') no-repeat center center;
+    background: url('/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -87,7 +87,7 @@ body {
     transform: translateY(-2px) scale(1.04);
 }
 #game-screen {
-    background: url('../assets/images/open.jpg') no-repeat center center;
+    background: url('/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     z-index: 1;
     transition: background 0.5s ease-in-out;
@@ -245,7 +245,7 @@ button:active {
     left: 50%;
     transform: translateX(-50%);
     transition: all 0.3s ease;
-    background: url('../assets/images/character.png') no-repeat center center;
+    background: url('/src/assets/images/character.png') no-repeat center center;
     background-size: contain;
     z-index: 5;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
@@ -532,7 +532,7 @@ button:active {
     opacity: 1;
 }
 .background.lose-bg {
-    background-image: url('../assets/images/lose.png');
+    background-image: url('/src/assets/images/lose.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -589,7 +589,7 @@ button:active {
     100% { transform: translateX(-50%) scale(1); }
 }
 .background.win-bg {
-    background-image: url('../assets/images/win.png');
+    background-image: url('/src/assets/images/win.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -787,7 +787,7 @@ button:active {
     width: 100%;
     height: 100%;
     /* Ganti background agar terang, misal pakai gambar open.jpg tanpa filter gelap */
-    background: url('../assets/images/open.jpg') center center/cover no-repeat;
+    background: url('/src/assets/images/open.jpg') center center/cover no-repeat;
     z-index: 1;
     display: block;
 

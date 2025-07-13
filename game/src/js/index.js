@@ -1,4 +1,4 @@
-import soundManager from './sound.js';
+import soundManager from '/src/js/sound.js';
 
 function checkLandscape() {
     const warning = document.getElementById('landscape-warning');

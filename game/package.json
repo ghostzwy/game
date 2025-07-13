@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Game simulasi kesiapsiagaan bencana yang edukatif",
   "scripts": {
+    "start": "vite",
     "build": "vite build",
-    "test": "jest --verbose",
-    "debug": "node --inspect-brk node_modules/.bin/jest --runInBand"
+    "test": "jest --verbose"
   },
   "dependencies": {
     "howler": "^2.2.3",
