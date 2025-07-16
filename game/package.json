@@ -4,7 +4,8 @@
   "description": "Game edukasi Siaga Bersama Dira",
   "main": "index.html",
   "scripts": {
-    "start": "npx serve ."
+    "start": "npx serve .",
+    "build": "echo No build step defined"
   },
   "dependencies": {}
 }
