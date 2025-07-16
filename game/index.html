@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <meta http-equiv="Content-Language" content="id">
+    <title>Siaga Bersama Dira</title>
+    <link rel="stylesheet" href="/src/css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <style>
+        .mute-btn-game {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 1001;
+            background: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            transition: background 0.2s;
+        }
+        .mute-btn-game:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Orientation Warning -->
+        <div id="orientation-warning" class="orientation-warning hidden">
+            <div class="warning-content">
+                <div class="warning-icon">🔄</div>
+                <p>Silakan putar perangkat Anda ke mode landscape untuk memulai game</p>
+                <div class="phone-rotate-animation">📱</div>
+            </div>
+        </div>
+        <!-- Start Screen -->
+        <div id="start-screen" class="screen">
+            <div class="opening-overlay">
+                <h1 class="opening-title">START GAME</h1>
+                <div class="opening-divider"></div>
+                <p class="opening-subtitle">TAP TO BEGIN</p>
+                <button id="start-btn" class="opening-btn">MULAI GAME</button>
+                <button id="mute-btn" class="opening-btn" style="margin-top:16px;">🔈 Mute</button>
+            </div>
+        </div>
+        <!-- Game Screen -->
+        <div id="game-screen" class="screen hidden">
+            <!-- Mute button pojok kanan atas, awalnya hidden -->
+            <button id="mute-btn-game" class="mute-btn-game hidden" title="Mute/Unmute">🔈</button>
+            <div id="background"></div>
+            <!-- Instruction Overlay -->
+            <div id="instruction" class="instruction hidden">
+                <div class="instruction-container">
+                    <span id="instruction-text"></span>
+
+                    <span id="instruction-next" class="hidden">Next &gt;</span>
+                </div>
+            </div>
+            <!-- Landscape Warning -->
+            <div id="landscape-warning" class="landscape-warning hidden">
+                <div class="landscape-warning-content">
+                    <div style="font-size:3em; margin-bottom:12px;">🔄</div>
+                    <div>Putar perangkat Anda ke <b>mode landscape</b> untuk bermain!</div>
+                </div>
+            </div>
+            <!-- HUD -->
+            <div class="hud">
+                <div id="timer">⏱️ Waktu: <span>30</span></div>
+                <div id="collected-items">🎒 Barang: <span>0</span></div>
+            </div>
+            <!-- Items Container Ruang 1 -->
+            <div id="items-container-ruang1" class="items-container">
+                <div class="item-inventory" data-name="Tas">🎒</div>
+                <div class="item-inventory" data-name="Air">💧</div>
+                <div class="item-inventory" data-name="P3K">🏥</div>
+                <div class="item-inventory" data-name="Senter">🔦</div>
+                <div class="item-inventory" data-name="Makanan">🍎</div>
+            </div>
+            <!-- Items Container Ruang 2 -->
+            <div id="items-container-ruang2" class="items-container hidden">
+                <div class="item-inventory" data-name="Handphone">📱</div>
+                <div class="item-inventory" data-name="Buku">📖</div>
+                <div class="item-inventory" data-name="Kacamata">👓</div>
+                <div class="item-inventory" data-name="Dompet">👛</div>
+                <div class="item-inventory" data-name="Kunci">🔑</div>
+            </div>
+            <!-- Items Container Ruang 3 -->
+            <div id="items-container-ruang3" class="items-container hidden"></div>
+            <!-- Area Navigation -->
+            <div id="area-navigation" class="area-navigation hidden">
+                <button id="arrow-left" class="arrow-btn">&#8592;</button>
+                <button id="arrow-right" class="arrow-btn">&#8594;</button>
+            </div>
+            <!-- Game Area -->
+            <div id="game-area">
+                <div id="character"></div>
+                <!-- Room 1 items -->
+                <div class="item-hidden item-ruang1" data-name="Tas" style="top: 18%; left: 12%;">🎒</div>
+                <div class="item-hidden item-ruang1" data-name="Air" style="top: 60%; left: 70%;">💧</div>
+                <div class="item-hidden item-ruang1" data-name="P3K" style="top: 40%; left: 40%;">🏥</div>
+                <div class="item-hidden item-ruang1" data-name="Senter" style="top: 60%; left: 25%;">🔦</div>
+                <div class="item-hidden item-ruang1" data-name="Makanan" style="top: 30%; left: 80%;">🍎</div>
+                <!-- Room 2 items (acak posisi) -->
+                <div class="item-hidden item-ruang2 hidden" data-name="Handphone" style="top: 22%; left: 18%;">📱</div>
+                <div class="item-hidden item-ruang2 hidden" data-name="Buku" style="top: 55%; left: 65%;">📖</div>
+                <div class="item-hidden item-ruang2 hidden" data-name="Kacamata" style="top: 38%; left: 33%;">👓</div>
+                <div class="item-hidden item-ruang2 hidden" data-name="Dompet" style="top: 62%; left: 48%;">👛</div>
+                <div class="item-hidden item-ruang2 hidden" data-name="Kunci" style="top: 28%; left: 72%;">🔑</div>
+                <!-- Room 3 background (sesi 3) -->
+                <div id="ruang3-bg" class="ruang3-bg hidden"></div>
+            </div>
+            <!-- Transition Overlay -->
+            <div id="transition-overlay" class="transition-overlay hidden"></div>
+        </div>
+        <!-- End Screen -->
+        <div id="end-screen" class="screen hidden">
+            <div class="content-wrapper">
+                <h2 id="result-message"></h2>
+                <button id="retry-btn">Main Lagi</button>
+            </div>
+        </div>
+        <!-- Lose Background -->
+        <div class="background lose-bg">
+            <!-- Tampilkan mute di lose background -->
+            <button id="mute-btn-game-lose" class="mute-btn-game hidden" title="Mute/Unmute">🔈</button>
+            <div class="lose-message" style="display:none;">
+                yahh aku tidak sempat mengambil barang di rumah!!
+            </div>
+        </div>
+        <!-- Win Background -->
+        <div class="background win-bg">
+            <div class="win-message" style="display:none;">
+                Alhamdulillah semua barang berhasil diselamatkan!!
+            </div>
+        </div>
+    </div>
+    <!-- Audio Container -->
+    <div id="audio-container">
+        <audio id="bgMusic" loop preload="auto" autoplay>
+            <source src="/src/assets/audio/sea.mp3" type="audio/mp3">
+        </audio>
+        <audio id="startGameSound" preload="auto">
+            <source src="/src/assets/audio/game.mp3" type="audio/mp3">
+        </audio>
+        <audio id="collectSound" preload="auto">
+            <source src="/src/assets/audio/8bit-coin-sound-effect.mp3" type="audio/mp3">
+        </audio>
+        <audio id="winSound" preload="auto">
+            <source src="/src/assets/audio/success-1-6297.mp3" type="audio/mp3">
+        </audio>
+        <audio id="loseSound" preload="auto">
+            <source src="/src/assets/audio/game-over-38511.mp3" type="audio/mp3">
+        </audio>
+    </div>
+    <!-- Scripts -->
+    <script type="module" src="/src/js/index.js"></script>
+    <script type="module" src="/src/js/sound.js"></script>
+    <script type="module" src="/src/js/orientation.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const bgMusic = document.getElementById('bgMusic');
+            const startBtn = document.getElementById('start-btn');
+            const startGameSound = document.getElementById('startGameSound');
+            const muteBtn = document.getElementById('mute-btn');
+            const muteBtnGame = document.getElementById('mute-btn-game');
+            const muteBtnGameLose = document.getElementById('mute-btn-game-lose');
+            let isMuted = false;
+            function setMute(mute) {
+                isMuted = mute;
+                bgMusic.muted = isMuted;
+                startGameSound.muted = isMuted;
+                document.getElementById('collectSound').muted = isMuted;
+                document.getElementById('winSound').muted = isMuted;
+                document.getElementById('loseSound').muted = isMuted;
+                muteBtn.textContent = isMuted ? '🔇 Unmute' : '🔈 Mute';
+                muteBtnGame.textContent = isMuted ? '🔇' : '🔈';
+                if (muteBtnGameLose) muteBtnGameLose.textContent = isMuted ? '🔇' : '🔈';
+            }
+            bgMusic.volume = 0.3;
+            bgMusic.play().catch(function(error) {
+                console.log("Audio play failed:", error);
+            });
+            startBtn.addEventListener('click', function() {
+                startGameSound.play().catch(function(error) {
+                    console.log("Start game sound failed:", error);
+                });
+            });
+            muteBtn.addEventListener('click', function() {
+                setMute(!isMuted);
+            });
+            muteBtnGame.addEventListener('click', function() {
+                setMute(!isMuted);
+            });
+            if (muteBtnGameLose) {
+                muteBtnGameLose.addEventListener('click', function() {
+                    setMute(!isMuted);
+                });
+            }
+            // Tampilkan/hide mute button sesuai scene
+            function showMuteBtnGame(show) {
+                if (muteBtnGame) muteBtnGame.classList.toggle('hidden', !show);
+            }
+            function showMuteBtnGameLose(show) {
+                if (muteBtnGameLose) muteBtnGameLose.classList.toggle('hidden', !show);
+            }
+            // Saat masuk game screen, tampilkan mute
+            document.getElementById('start-btn').addEventListener('click', function() {
+                showMuteBtnGame(true);
+                showMuteBtnGameLose(false);
+            });
+            // Saat lose background muncul, tampilkan mute di lose
+            const loseBg = document.querySelector('.background.lose-bg');
+            const observerLose = new MutationObserver(() => {
+                if (loseBg.style.display === 'block') {
+                    showMuteBtnGame(false);
+                    showMuteBtnGameLose(true);
+                } else {
+                    showMuteBtnGameLose(false);
+                }
+            });
+            if (loseBg) observerLose.observe(loseBg, { attributes: true, attributeFilter: ['style'] });
+            // Saat game screen kembali, tampilkan mute di game
+            const gameScreen = document.getElementById('game-screen');
+            const observerGame = new MutationObserver(() => {
+                if (!gameScreen.classList.contains('hidden')) {
+                    showMuteBtnGame(true);
+                    showMuteBtnGameLose(false);
+                } else {
+                    showMuteBtnGame(false);
+                }
+            });
+            if (gameScreen) observerGame.observe(gameScreen, { attributes: true, attributeFilter: ['class'] });
+        });
+    </script>
+
+</body>
+</html>

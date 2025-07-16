@@ -1,0 +1,10 @@
+{
+  "name": "siaga-bersama-dira",
+  "version": "1.0.0",
+  "description": "Game edukasi Siaga Bersama Dira",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ."
+  },
+  "dependencies": {}
+}

@@ -1,4 +1,4 @@
-import soundManager from '/game/src/js/sound.js';
+import soundManager from './sound.js';
 
 function checkLandscape() {
     const warning = document.getElementById('landscape-warning');
@@ -120,55 +120,351 @@ class Game {
             inventoryItem.classList.add('found');
         }
         soundManager.play('collect');
+        // --- FIX: cek area dan item ruang1 ---
         if (
             this.areas[this.currentArea] === 'ruang1' &&
             document.querySelectorAll('.item-ruang1:not(.found)').length === 0
         ) {
-            this.showKamarWarningInstruction(() => {
-                showRoomTransition(() => this.gotoRuang2());
-            });
+            // Semua barang ruang 1 sudah dikumpulkan, tampilkan instruksi dulu, lalu langsung ke ruang 2 tanpa animasi slide kanan
+            this.isRunning = false;
+            setTimeout(() => {
+                // --- PATCH: pastikan callback instruksi ruang 1 tidak tertimpa onclick lain ---
+                let handled = false;
+                const afterInstruksi = () => {
+                    if (handled) return;
+                    handled = true;
+                    showRoomTransition(() => this.gotoRuang2());
+                };
+                // Gunakan instruksi dengan tombol next (default)
+                this.showTypingInstruction(
+                    'alhamdulilah barang di ruang tamu sudah berhasil dikumpulkan! Sekarang ke kamar untuk mengambil barang yang lainya',
+                    60,
+                    false,
+                    false,
+                    afterInstruksi
+                );
+                // Jaga-jaga: pastikan instruksi hanya bisa di-klik sekali
+                const instruction = document.getElementById('instruction');
+                const instructionNext = document.getElementById('instruction-next');
+                if (instruction && instructionNext) {
+                    instruction.onclick = afterInstruksi;
+                    instructionNext.onclick = afterInstruksi;
+                }
+            }, 350);
             return;
         }
+        // Ruang 2: instruksi + tombol <back, lanjut ke ruang 3
         if (
             this.areas[this.currentArea] === 'ruang2' &&
             document.querySelectorAll('.item-ruang2:not(.found)').length === 0
         ) {
-            // Semua item ruang2 sudah dikumpulkan, tampilkan pesan kemenangan lalu ke ruang3
-            this.showTypingInstruction(
-                'Alhamdulillah semua barang berhasil diselamatkan!!',
-                60,
-                false,
-                false,
-                () => this.gotoRuang3Simple() // Ganti ke metode ruang3 sederhana
-            );
+            this.isRunning = false;
+            setTimeout(() => {
+                this.showTypingInstructionWithBack(
+                    'Semua barang di kamar sudah berhasil dikumpulkan! Sekarang keluar rumah ke tempat aman!',
+                    60,
+                    () => {
+                        this.gotoRuang3Simple();
+                    }
+                );
+            }, 350);
+            return;
+        }
+        // Ruang 3: setelah semua barang diambil, tampilkan instruksi <back di tengah
+        if (
+            this.areas[this.currentArea] === 'ruang3' &&
+            document.querySelectorAll('.item-ruang3:not(.found)').length === 0
+        ) {
+            this.isRunning = false;
+            setTimeout(() => {
+                this.showBackOnlyInstruction(() => {
+                    this.gotoRuang4Win();
+                });
+            }, 350);
             return;
         }
     }
 
+    // Instruksi hanya <back di tengah layar (khusus ruang 3 & ruang 4, bisa dengan pesan custom)
+    showBackOnlyInstruction(callback = null, message = null) {
+        const instruction = document.getElementById('instruction');
+        const instructionContainer = document.querySelector('.instruction-container');
+        const instructionTextEl = document.getElementById('instruction-text');
+        const instructionNext = document.getElementById('instruction-next');
+
+        // Bersihkan isi container
+        if (instructionTextEl) instructionTextEl.textContent = '';
+        if (instructionNext) instructionNext.classList.add('hidden');
+        if (instructionContainer) instructionContainer.innerHTML = '';
+
+        // Buat tombol <back di tengah
+        let backBtn = document.getElementById('back-instruksi');
+        if (!backBtn) {
+            backBtn = document.createElement('span');
+            backBtn.id = 'back-instruksi';
+        }
+        backBtn.textContent = '< back';
+        backBtn.style.cursor = 'pointer';
+        backBtn.style.fontSize = '2em';
+        backBtn.style.padding = '18px 40px';
+        backBtn.style.background = 'rgba(0,0,0,0.25)';
+        backBtn.style.borderRadius = '16px';
+        backBtn.style.fontWeight = 'bold';
+        backBtn.style.color = '#ffd700';
+        backBtn.style.display = 'inline-block';
+        backBtn.style.margin = '0 auto';
+        backBtn.style.textAlign = 'center';
+
+        // Pesan custom di atas tombol jika ada
+        if (instructionContainer) {
+            instructionContainer.style.justifyContent = 'center';
+            instructionContainer.style.alignItems = 'center';
+            instructionContainer.innerHTML = '';
+            if (message) {
+                const msg = document.createElement('div');
+                msg.style.textAlign = 'center';
+                msg.style.fontSize = '1.5em';
+                msg.style.fontWeight = 'bold';
+                msg.style.color = '#fff';
+                msg.style.marginBottom = '24px';
+                msg.textContent = message;
+                instructionContainer.appendChild(msg);
+            }
+            instructionContainer.appendChild(backBtn);
+        }
+
+        instruction.classList.remove('hidden');
+        instruction.style.pointerEvents = 'auto';
+
+        backBtn.onclick = () => {
+            instruction.classList.add('hidden');
+            backBtn.classList.add('hidden');
+            if (typeof callback === 'function') callback();
+        };
+        instruction.onclick = backBtn.onclick;
+        backBtn.classList.remove('hidden');
+    }
+
+    // Instruksi hanya <back di tengah layar (khusus ruang 3 & ruang 4, bisa dengan pesan custom dan tombol custom)
+    showBackOnlyInstruction(callback = null, message = null, buttonText = null, ruang4Clean = false, verticalLayout = false) {
+        const instruction = document.getElementById('instruction');
+        const instructionContainer = document.querySelector('.instruction-container');
+        const instructionTextEl = document.getElementById('instruction-text');
+        const instructionNext = document.getElementById('instruction-next');
+
+        // Bersihkan isi container
+        if (instructionTextEl) instructionTextEl.textContent = '';
+        if (instructionNext) instructionNext.classList.add('hidden');
+        if (instructionContainer) instructionContainer.innerHTML = '';
+
+        // Gunakan class untuk mengatur background instruksi
+        if (ruang4Clean && instruction) {
+            instruction.classList.add('ruang4-clear-bg');
+        } else if (instruction) {
+            instruction.classList.remove('ruang4-clear-bg');
+        }
+
+        // Atur layout atas-bawah jika verticalLayout true
+        if (instructionContainer && verticalLayout) {
+            instructionContainer.style.flexDirection = 'column';
+            instructionContainer.style.justifyContent = 'center';
+            instructionContainer.style.alignItems = 'center';
+            instructionContainer.innerHTML = '';
+
+            if (message) {
+                const msg = document.createElement('div');
+                msg.style.textAlign = 'center';
+                msg.style.fontSize = '1.5em';
+                msg.style.fontWeight = 'bold';
+                msg.style.color = '#fff';
+                msg.style.marginBottom = buttonText ? '32px' : '0';
+                msg.textContent = message;
+                instructionContainer.appendChild(msg);
+            }
+
+            if (buttonText) {
+                let backBtn = document.getElementById('back-instruksi');
+                if (!backBtn) {
+                    backBtn = document.createElement('span');
+                    backBtn.id = 'back-instruksi';
+                }
+                backBtn.textContent = buttonText;
+                backBtn.style.cursor = 'pointer';
+                backBtn.style.fontSize = '2em';
+                backBtn.style.padding = '18px 40px';
+                backBtn.style.background = 'rgba(0,0,0,0.25)';
+                backBtn.style.borderRadius = '16px';
+                backBtn.style.fontWeight = 'bold';
+                backBtn.style.color = '#ffd700';
+                backBtn.style.display = 'block';
+                backBtn.style.margin = '0 auto';
+                backBtn.style.textAlign = 'center';
+
+                instructionContainer.appendChild(backBtn);
+
+                instruction.classList.remove('hidden');
+                instruction.style.pointerEvents = 'auto';
+
+                backBtn.onclick = () => {
+                    instruction.classList.add('hidden');
+                    backBtn.classList.add('hidden');
+                    // Hilangkan overlay gelap jika ada
+                    let overlay = document.getElementById('win-dark-overlay');
+                    if (overlay) overlay.style.display = 'none';
+                    if (typeof callback === 'function') callback();
+                };
+                instruction.onclick = backBtn.onclick;
+                backBtn.classList.remove('hidden');
+                return;
+            } else {
+                // Hanya pesan saja, tanpa tombol
+                instruction.classList.remove('hidden');
+                instruction.style.pointerEvents = 'none';
+                return;
+            }
+        }
+
+        // Default: pesan di atas, tombol di bawah (atau inline)
+        let backBtn = document.getElementById('back-instruksi');
+        if (!backBtn) {
+            backBtn = document.createElement('span');
+            backBtn.id = 'back-instruksi';
+        }
+        backBtn.textContent = buttonText || '< back';
+        backBtn.style.cursor = 'pointer';
+        backBtn.style.fontSize = '2em';
+        backBtn.style.padding = '18px 40px';
+        backBtn.style.background = 'rgba(0,0,0,0.25)';
+        backBtn.style.borderRadius = '16px';
+        backBtn.style.fontWeight = 'bold';
+        backBtn.style.color = '#ffd700';
+        backBtn.style.display = 'inline-block';
+        backBtn.style.margin = '0 auto';
+        backBtn.style.textAlign = 'center';
+
+        if (instructionContainer) {
+            instructionContainer.style.flexDirection = '';
+            instructionContainer.style.justifyContent = 'center';
+            instructionContainer.style.alignItems = 'center';
+            instructionContainer.innerHTML = '';
+            if (message) {
+                const msg = document.createElement('div');
+                msg.style.textAlign = 'center';
+                msg.style.fontSize = '1.5em';
+                msg.style.fontWeight = 'bold';
+                msg.style.color = '#fff';
+                msg.style.marginBottom = '24px';
+                msg.textContent = message;
+                instructionContainer.appendChild(msg);
+            }
+            instructionContainer.appendChild(backBtn);
+        }
+
+        instruction.classList.remove('hidden');
+        instruction.style.pointerEvents = 'auto';
+
+        backBtn.onclick = () => {
+            instruction.classList.add('hidden');
+            backBtn.classList.add('hidden');
+            if (typeof callback === 'function') callback();
+        };
+        instruction.onclick = backBtn.onclick;
+        backBtn.classList.remove('hidden');
+    }
+
+    // Instruksi dengan tombol "<back" di kiri instruksi
+    showTypingInstructionWithBack(text, speed = 80, callback = null) {
+        const instruction = document.getElementById('instruction');
+        const instructionTextEl = document.getElementById('instruction-text');
+        const instructionNext = document.getElementById('instruction-next');
+        const instructionContainer = document.querySelector('.instruction-container');
+
+        // Buat elemen tombol <back
+        let backBtn = document.getElementById('back-instruksi');
+        if (!backBtn) {
+            backBtn = document.createElement('span');
+            backBtn.id = 'back-instruksi';
+            backBtn.style.cursor = 'pointer';
+            backBtn.style.fontSize = '1.3em';
+            backBtn.style.padding = '8px 18px';
+            backBtn.style.background = 'rgba(0,0,0,0.2)';
+            backBtn.style.borderRadius = '8px';
+            backBtn.style.fontWeight = 'bold';
+            backBtn.style.color = '#ffd700';
+            backBtn.style.marginRight = '18px';
+            backBtn.innerHTML = '&lt;back';
+        }
+
+        // Pastikan backBtn di kiri (sebelum instructionText)
+        if (instructionContainer && instructionContainer.firstChild !== backBtn) {
+            instructionContainer.insertBefore(backBtn, instructionContainer.firstChild);
+        }
+
+        backBtn.classList.remove('hidden');
+        instructionNext.classList.add('hidden');
+        instruction.classList.remove('hidden');
+        instructionTextEl.textContent = '';
+        instruction.style.pointerEvents = 'none';
+
+        let i = 0;
+        const typeNext = () => {
+            if (i < text.length) {
+                instructionTextEl.textContent += text[i];
+                i++;
+                setTimeout(typeNext, speed);
+            } else {
+                instruction.style.pointerEvents = 'auto';
+                backBtn.onclick = () => {
+                    instruction.classList.add('hidden');
+                    backBtn.classList.add('hidden');
+                    instructionTextEl.textContent = '';
+                    if (typeof callback === 'function') callback();
+                };
+                instruction.onclick = backBtn.onclick;
+            }
+        };
+        typeNext();
+    }
+
     gotoRuang2() {
         // Ganti background ke bedroom.png
-        changeBackground('/game/src/assets/images/bedroom.png');
+        const bg = document.getElementById('background');
+        if (bg) {
+            bg.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
+        }
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen) {
+            gameScreen.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
+            gameScreen.style.backgroundSize = 'cover';
+        }
         // Sembunyikan item ruang1
         document.querySelectorAll('.item-ruang1').forEach(item => {
             item.classList.add('hidden');
             item.style.display = 'none';
         });
         document.getElementById('items-container-ruang1')?.classList.add('hidden');
+        // Tampilkan dan aktifkan item ruang2
         document.querySelectorAll('.item-ruang2').forEach(item => {
             item.classList.remove('hidden');
-            item.style.display = '';
+            item.style.display = 'block';
             item.style.pointerEvents = 'auto';
         });
         document.getElementById('items-container-ruang2')?.classList.remove('hidden');
         this.currentArea = 1;
-        // Hapus event lama dan bind ulang agar klik berfungsi
+        // Bind event agar item ruang2 bisa diklik/dikumpulkan
         document.querySelectorAll('.item-ruang2').forEach(item => {
-            // Remove all previous event listeners by replacing node
             const newItem = item.cloneNode(true);
             item.parentNode.replaceChild(newItem, item);
             newItem.style.pointerEvents = 'auto';
+            newItem.style.display = 'block';
+            newItem.classList.remove('hidden');
             newItem.addEventListener('click', () => this.collectItem(newItem));
         });
+        // Timer tetap dilanjutkan dari ruang 1, tidak di-reset
+        document.querySelector('#timer span').textContent = Math.ceil(this.timeLeft);
+        this.timerStarted = true;
+        this.isRunning = true;
+        this.startTimer();
     }
     
     // Tambahkan metode baru untuk ruang3 sederhana
@@ -180,16 +476,109 @@ class Game {
         });
         // Tampilkan background ruang3
         document.getElementById('ruang3-bg')?.classList.remove('hidden');
-        // Ganti background jika perlu
-        changeBackground('/game/src/assets/images/open.jpg');
-        // Tampilkan instruksi ruang3
-        this.showTypingInstruction(
-            'Kamu sudah sampai di luar rumah dengan semua barang penting. Tunggu bantuan datang di tempat aman!',
-            60,
-            false,
-            false,
-            null
-        );
+        // Ganti background ke open.jpg
+        const bg = document.getElementById('background');
+        if (bg) {
+            bg.style.backgroundImage = "url('/src/assets/images/open.jpg')";
+            // Hapus blur (fitur blur dihilangkan)
+            bg.style.filter = '';
+        }
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen) {
+            gameScreen.style.backgroundImage = "url('/src/assets/images/open.jpg')";
+            gameScreen.style.backgroundSize = 'cover';
+            // Hapus blur (fitur blur dihilangkan)
+            gameScreen.style.filter = '';
+        }
+        // Tidak ada item, tidak ada HUD, hanya instruksi <back di tengah
+        this.currentArea = 2;
+        this.isRunning = false;
+        this.timerStarted = false;
+
+        // Tampilkan instruksi <back di ruang 3 dengan delay sedikit (misal 1200ms)
+        setTimeout(() => {
+            this.showBackOnlyInstruction(() => {
+                this.gotoRuang4Win();
+            });
+        }, 1200);
+    }
+
+    gotoRuang4Win() {
+        // Sembunyikan semua elemen game utama
+        document.querySelectorAll('.item-ruang1, .item-ruang2, .item-ruang3, .hud, #items-container-ruang1, #items-container-ruang2, #items-container-ruang3, #area-navigation, #character').forEach(el => {
+            el.classList.add('hidden');
+            if (el.style) el.style.display = 'none';
+        });
+        // Ganti background ke win.png
+        const bg = document.getElementById('background');
+        if (bg) {
+            bg.style.backgroundImage = "url('/src/assets/images/win.png')";
+        }
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen) {
+            gameScreen.style.backgroundImage = "url('/src/assets/images/win.png')";
+            gameScreen.style.backgroundSize = 'cover';
+        }
+        // Mainkan winn.mp3 (pastikan sudah ada di HTML dengan id="winnSound")
+        let winnAudio = document.getElementById('winnSound');
+        if (!winnAudio) {
+            winnAudio = document.createElement('audio');
+            winnAudio.id = 'winnSound';
+            winnAudio.src = '/src/assets/audio/winn.mp3';
+            winnAudio.preload = 'auto';
+            document.body.appendChild(winnAudio);
+        }
+        let winDelay = 0;
+        try {
+            winnAudio.currentTime = 0;
+            winnAudio.play();
+            winDelay = (winnAudio.duration && !isNaN(winnAudio.duration)) ? Math.ceil(winnAudio.duration * 1000) : 1200;
+        } catch (e) {
+            winDelay = 1200;
+        }
+
+        setTimeout(() => {
+            this.showBackOnlyInstruction(
+                null,
+                'Alhamdulillah semua barang berhasil diselamatkan!!',
+                null,
+                true, // ruang4Clean
+                true  // verticalLayout
+            );
+            // Setelah sound selesai, munculkan instruksi "AYO MAINKAN LAGI😊" dengan animasi menarik
+            const showMainLagi = () => {
+                this.showBackOnlyInstruction(() => {
+                    window.location.reload();
+                }, 'Alhamdulillah semua barang berhasil diselamatkan!!', 'AYO MAINKAN LAGI😊', false, true);
+
+                // Tambahkan animasi pada tombol "AYO MAINKAN LAGI😊"
+                setTimeout(() => {
+                    const backBtn = document.getElementById('back-instruksi');
+                    if (backBtn) {
+                        backBtn.style.opacity = '0';
+                        backBtn.style.transform = 'scale(0.7) rotate(-10deg)';
+                        backBtn.style.transition = 'opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+                        setTimeout(() => {
+                            backBtn.style.opacity = '1';
+                            backBtn.style.transform = 'scale(1) rotate(0deg)';
+                            // Tambahkan efek bounce
+                            backBtn.classList.add('main-lagi-bounce');
+                            setTimeout(() => {
+                                backBtn.classList.remove('main-lagi-bounce');
+                            }, 1200);
+                        }, 10);
+                    }
+                }, 50);
+            };
+            if (winnAudio) {
+                let shown = false;
+                const showIfNotYet = () => { if (!shown) { shown = true; setTimeout(showMainLagi, 7000); } };
+                winnAudio.onended = showIfNotYet;
+                setTimeout(showIfNotYet, winDelay);
+            } else {
+                setTimeout(showMainLagi, 7000);
+            }
+        }, 350);
         this.isRunning = false;
     }
 
@@ -214,7 +603,6 @@ class Game {
         roomArrow.classList.remove('hidden');
         instructionNext.classList.add('hidden');
         instruction.style.pointerEvents = 'none';
-        this.isRunning = false;
         let i = 0;
         const typeNext = () => {
             if (i < instructionText.length) {
@@ -267,7 +655,6 @@ class Game {
         instructionTextEl.textContent = '';
         instructionNext.classList.add('hidden');
         instruction.style.pointerEvents = 'none';
-        this.isRunning = false; // Pause timer when instruction is shown
         
         let i = 0;
         const typeNext = () => {
@@ -281,27 +668,21 @@ class Game {
             } else {
                 instructionNext.classList.remove('hidden');
                 instruction.style.pointerEvents = 'auto';
-                instruction.addEventListener('click', handleClick);
+                const resumeGame = () => {
+                    instruction.classList.add('hidden');
+                    instruction.removeEventListener('click', resumeGame);
+                    instructionNext.onclick = null;
+                    document.querySelectorAll('.item-hidden').forEach(item => {
+                        item.style.pointerEvents = 'auto';
+                    });
+                    this.timerStarted = true;
+                    this.isRunning = true;
+                    this.gameLoop();
+                };
+                instruction.addEventListener('click', resumeGame);
+                instructionNext.onclick = resumeGame;
             }
         };
-        
-        const handleClick = () => {
-            instruction.classList.add('hidden');
-            instructionNext.classList.add('hidden');
-            instruction.removeEventListener('click', handleClick);
-            if (showHudAfter) {
-                document.querySelector('.hud')?.classList.remove('hidden');
-                document.getElementById('items-container')?.classList.remove('hidden');
-            }
-            if (lanjutGame) {
-                this.isRunning = true;
-                this.gameLoop();
-            }
-            if (callback) {
-                callback(); // Execute callback function if provided
-            }
-        };
-        
         typeNext();
     }
 
@@ -324,7 +705,7 @@ class Game {
         this.instructionShown = true;
         this.isRunning = false; // Pause timer when instruction is shown
         this.timerStarted = false;
-        document.querySelector('#timer span').textContent = '60';
+        document.querySelector('#timer span').textContent = '30'; // Ubah dari 60 ke 30
         document.querySelectorAll('.item-hidden').forEach(item => {
             item.style.pointerEvents = 'none';
         });
@@ -433,7 +814,7 @@ const audioManager = {
     backgroundMusic: null,
     init() {
         this.backgroundMusic = document.getElementById('bgMusic');
-        if (this.backgroundMusic) {
+        if (this.backgroundMusic) { // <-- perbaiki typo: tambahkan tanda kurung
             this.backgroundMusic.volume = 0.3;
         }
     },
@@ -681,7 +1062,7 @@ function checkAllItemsCollected() {
     // collectedItems adalah array nama item yang sudah dikumpulkan
     if (typeof itemsRuang1 !== 'undefined' && typeof collectedItems !== 'undefined') {
         if (itemsRuang1.every(item => collectedItems.includes(item))) {
-            changeBackground('/game/src/assets/images/bedroom.png');
+            changeBackground('assets/images/bedroom.png');
         }
     }
 }
@@ -700,11 +1081,11 @@ function onItemCollected(itemName) {
 function changeBackground(imageName) {
     const bg = document.getElementById('background');
     if (bg) {
-        bg.style.backgroundImage = `url('/game${imageName.replace(/^\/game/, "")}')`;
+        bg.style.backgroundImage = `url('${imageName}')`;
     } else {
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = `url('/game${imageName.replace(/^\/game/, "")}')`;
+            gameScreen.style.backgroundImage = `url('${imageName}')`;
             gameScreen.style.backgroundSize = 'cover';
         }
     }

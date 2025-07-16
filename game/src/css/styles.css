@@ -26,7 +26,7 @@ body {
     transition: all 0.5s ease-in-out;
 }
 #start-screen {
-    background: url('/game/src/assets/images/open.jpg') no-repeat center center;
+    background: url('/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -69,7 +69,7 @@ body {
     text-shadow: 0 1px 4px #0007;
 }
 .opening-btn {
-    padding: 16px 36px;
+    padding: 6px 36px;
     font-size: 1.1em;
     background: #27ae60;
     color: #fff;
@@ -87,7 +87,7 @@ body {
     transform: translateY(-2px) scale(1.04);
 }
 #game-screen {
-    background: url('/game/src/assets/images/open.jpg') no-repeat center center;
+    background: url('/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     z-index: 1;
     transition: background 0.5s ease-in-out;
@@ -202,16 +202,28 @@ button:active {
     height: 65px;
     font-size: 2.2em;
     cursor: pointer;
-    display: flex;
     justify-content: center;
     align-items: center;
-    background: none;
-    border-radius: 12px;
-    box-shadow: none;
-    transition: opacity 0.3s, transform 0.3s;
+    transition: all 0.3s ease;
     z-index: 2;
 }
 .item-hidden.found {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.3);
+}
+.item-hidden.item-ruang2 {
+    position: absolute;
+    width: 65px;
+    height: 65px;
+    font-size: 2.2em;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+.item-hidden.item-ruang2.found {
     opacity: 0;
     pointer-events: none;
     transform: scale(1.3);
@@ -245,7 +257,7 @@ button:active {
     left: 50%;
     transform: translateX(-50%);
     transition: all 0.3s ease;
-    background: url('/game/src/assets/images/character.png') no-repeat center center;
+    background: url('/src/assets/images/character.png') no-repeat center center;
     background-size: contain;
     z-index: 5;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
@@ -328,8 +340,8 @@ button:active {
 .instruction {
     position: fixed;
     inset: 0;
-    background: rgba(20, 24, 38, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(20, 24, 38, 0.5); /* Default: gelap */
+    backdrop-filter: none;
     color: #fff;
     display: flex;
     align-items: flex-end;
@@ -532,7 +544,7 @@ button:active {
     opacity: 1;
 }
 .background.lose-bg {
-    background-image: url('/game/src/assets/images/lose.png');
+    background-image: url('/src/assets/images/lose.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -556,6 +568,7 @@ button:active {
     text-align: center;
     letter-spacing: 1px;
     box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    margin-bottom: 36px; /* Tambahkan space antar instruksi dan tombol di desktop */
 }
 .background.lose-bg .retry-button {
     position: absolute;
@@ -573,23 +586,27 @@ button:active {
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     text-transform: uppercase;
-    margin-top: 20px;
+    margin-top: 36px; /* Tambahkan space antar instruksi dan tombol di desktop */
     animation: pulseButton 2s infinite;
 }
 
-.background.lose-bg .retry-button:hover {
-    background: #c0392b;
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-}
-
-@keyframes pulseButton {
-    0% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.05); }
-    100% { transform: translateX(-50%) scale(1); }
+/* Responsive lose background spacing for mobile */
+@media (max-width: 600px), (max-height: 600px) {
+    .background.lose-bg .lose-message {
+        bottom: 16%;
+        font-size: 1.1em;
+        padding: 12px 18px;
+        margin-bottom: 12px; /* Space lebih kecil di mobile */
+    }
+    .background.lose-bg .retry-button {
+        bottom: 8%;
+        font-size: 1em;
+        padding: 10px 24px;
+        margin-top: 12px; /* Space lebih kecil di mobile */
+    }
 }
 .background.win-bg {
-    background-image: url('/game/src/assets/images/win.png');
+    background-image: url('/src/assets/images/win.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -703,95 +720,49 @@ button:active {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(90deg); }
 }
-
-/* Room 2 styles from ruang2.css */
-/* --- Room 2 --- */
-#items-container-ruang2.items-container {
-    /* Styles for Room 2 inventory bar */
-    position: fixed;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    background: rgba(255,255,255,0.85);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    z-index: 10;
-    backdrop-filter: blur(5px);
+#game-screen.bg-ruang2 {
+    background: url('/src/assets/images/bedroom.png') no-repeat center center;
+    background-size: cover !important;
+    transition: background 0.5s ease-in-out;
 }
-.item-inventory.found {
-    opacity: 0.3;
+.instruction.ruang4-clear-bg {
+    background: transparent !important;
 }
-.item-hidden.item-ruang2 {
+#back-instruksi {
+    transition: opacity 0.5s cubic-bezier(0.4,0,0.2,1), transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.main-lagi-bounce {
+    animation: mainLagiBounce 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+}
+@keyframes mainLagiBounce {
+    0%   { transform: scale(1) rotate(0deg);}
+    10%  { transform: scale(1.15) rotate(-5deg);}
+    20%  { transform: scale(0.95) rotate(3deg);}
+    30%  { transform: scale(1.08) rotate(-2deg);}
+    40%  { transform: scale(0.98) rotate(2deg);}
+    50%  { transform: scale(1.04) rotate(-1deg);}
+    60%  { transform: scale(1) rotate(0deg);}
+    100% { transform: scale(1) rotate(0deg);}
+}
+.mute-btn-game {
     position: absolute;
-    width: 65px;
-    height: 65px;
-    font-size: 2.2em;
+    top: 18px;
+    right: 18px;
+    z-index: 2001;
+    background: rgba(255,255,255,0.7);
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    font-size: 1.5em;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transition: background 0.2s;
     display: flex;
-    justify-content: center;
     align-items: center;
-    transition: all 0.3s ease;
-    z-index: 2;
+    justify-content: center;
 }
-.item-hidden.item-ruang2.found {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(1.3);
-}
-.item-hidden.item-ruang2[data-name="Handphone"] { top: 20%; left: 20%; }
-.item-hidden.item-ruang2[data-name="Buku"] { top: 50%; left: 60%; }
-.item-hidden.item-ruang2[data-name="Kacamata"] { top: 40%; left: 30%; }
-.item-hidden.item-ruang2[data-name="Dompet"] { top: 60%; left: 50%; }
-.item-hidden.item-ruang2[data-name="Kunci"] { top: 30%; left: 70%; }
-#background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: -1;
-    transition: background-image 0.5s ease;
-}
-.ruang-label {
-    font-weight: bold;
-    margin-bottom: 4px;
-    font-size: 1.1em;
-    color: #333;
-}
-.transition-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    opacity: 0;
-    z-index: 10000;
-    pointer-events: none;
-    transition: opacity 0.7s cubic-bezier(.4,0,.2,1);
+.mute-btn-game.hidden {
+    display: none !important;
 }
 
-.transition-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-.ruang3-bg {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100%;
-    height: 100%;
-    /* Ganti background agar terang, misal pakai gambar open.jpg tanpa filter gelap */
-    background: url('/game/src/assets/images/open.jpg') center center/cover no-repeat;
-    z-index: 1;
-    display: block;
-
-}   
-.ruang3-bg.hidden {
-    display: block;
-}
