@@ -26,7 +26,7 @@ body {
     transition: all 0.5s ease-in-out;
 }
 #start-screen {
-    background: url('/src/assets/images/open.jpg') no-repeat center center;
+    background: url('/game/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     display: flex;
     justify-content: center;
@@ -87,7 +87,7 @@ body {
     transform: translateY(-2px) scale(1.04);
 }
 #game-screen {
-    background: url('/src/assets/images/open.jpg') no-repeat center center;
+    background: url('/game/src/assets/images/open.jpg') no-repeat center center;
     background-size: cover;
     z-index: 1;
     transition: background 0.5s ease-in-out;
@@ -257,7 +257,7 @@ button:active {
     left: 50%;
     transform: translateX(-50%);
     transition: all 0.3s ease;
-    background: url('/src/assets/images/character.png') no-repeat center center;
+    background: url('/game/src/assets/images/character.png') no-repeat center center;
     background-size: contain;
     z-index: 5;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
@@ -497,6 +497,66 @@ button:active {
         font-size: 0.9em;
     }
 }
+
+/* Perkecil instruksi dan item di HP */
+@media (max-width: 600px) {
+    .instruction-container {
+        gap: 4px;
+    }
+    #instruction-text {
+        font-size: 0.85em;
+        padding: 6px 0 6px 10px;
+        border-radius: 7px 0 0 7px;
+        margin-bottom: 8px;
+        max-width: 96vw;
+    }
+    #instruction-next {
+        font-size: 0.85em;
+        padding: 6px 10px 6px 6px;
+        border-radius: 0 7px 7px 0;
+        margin-bottom: 8px;
+    }
+    #back-instruksi {
+        font-size: 0.85em !important;
+        padding: 4px 10px !important;
+        border-radius: 6px !important;
+        margin-right: 4px !important;
+    }
+    .item-hidden,
+    .item-hidden.item-ruang1,
+    .item-hidden.item-ruang2,
+    .item-hidden.item-ruang2.hidden {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 0.8em !important;
+    }
+    .item-inventory {
+        width: 18px !important;
+        height: 18px !important;
+        font-size: 0.8em !important;
+    }
+}
+
+/* Instruksi ruang2 lebih kecil di HP */
+@media (max-width: 600px) {
+    .ruang2-instruction .instruction-container {
+        gap: 1px !important;
+    }
+    .ruang2-instruction #instruction-text {
+        font-size: 0.6em !important;
+        padding: 3px 0 3px 5px !important;
+        border-radius: 4px 0 0 4px !important;
+        margin-bottom: 2px !important;
+        max-width: 98vw !important;
+    }
+    .ruang2-instruction #back-instruksi {
+        font-size: 0.6em !important;
+        padding: 2px 6px !important;
+        border-radius: 4px !important;
+        margin-right: 2px !important;
+    }
+}
+
 .instruction-container {
     display: flex;
     align-items: center;
@@ -544,7 +604,7 @@ button:active {
     opacity: 1;
 }
 .background.lose-bg {
-    background-image: url('/src/assets/images/lose.png');
+    background-image: url('/game/src/assets/images/lose.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -606,7 +666,7 @@ button:active {
     }
 }
 .background.win-bg {
-    background-image: url('/src/assets/images/win.png');
+    background-image: url('/game/src/assets/images/win.png');
     background-size: cover;
     background-position: center;
     position: absolute;
@@ -721,7 +781,7 @@ button:active {
     100% { transform: rotate(90deg); }
 }
 #game-screen.bg-ruang2 {
-    background: url('/src/assets/images/bedroom.png') no-repeat center center;
+    background: url('/game/src/assets/images/bedroom.png') no-repeat center center;
     background-size: cover !important;
     transition: background 0.5s ease-in-out;
 }

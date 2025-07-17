@@ -379,28 +379,36 @@ class Game {
         const instructionNext = document.getElementById('instruction-next');
         const instructionContainer = document.querySelector('.instruction-container');
 
-        // Buat elemen tombol <back
+        // Tambahkan class khusus ruang2 agar bisa di-style di CSS
+        instruction.classList.add('ruang2-instruction');
+
+        // Buat elemen tombol < BACK
         let backBtn = document.getElementById('back-instruksi');
         if (!backBtn) {
             backBtn = document.createElement('span');
             backBtn.id = 'back-instruksi';
-            backBtn.style.cursor = 'pointer';
-            backBtn.style.fontSize = '1.3em';
-            backBtn.style.padding = '8px 18px';
-            backBtn.style.background = 'rgba(0,0,0,0.2)';
-            backBtn.style.borderRadius = '8px';
-            backBtn.style.fontWeight = 'bold';
-            backBtn.style.color = '#ffd700';
-            backBtn.style.marginRight = '18px';
-            backBtn.innerHTML = '&lt;back';
         }
+        backBtn.textContent = '< BACK';
+        backBtn.style.cursor = 'pointer';
+        backBtn.style.fontSize = '1.2em';
+        backBtn.style.padding = '6px 16px';
+        backBtn.style.background = 'rgba(0,0,0,0.2)';
+        backBtn.style.borderRadius = '7px';
+        backBtn.style.fontWeight = 'bold';
+        backBtn.style.color = '#ffd700';
+        backBtn.style.marginRight = '10px';
+        backBtn.style.marginBottom = '0';
+        backBtn.classList.add('hidden'); // Sembunyikan dulu
 
         // Pastikan backBtn di kiri (sebelum instructionText)
-        if (instructionContainer && instructionContainer.firstChild !== backBtn) {
-            instructionContainer.insertBefore(backBtn, instructionContainer.firstChild);
+        if (instructionContainer) {
+            instructionContainer.innerHTML = '';
+            instructionContainer.style.flexDirection = 'row';
+            instructionContainer.style.alignItems = 'center';
+            instructionContainer.appendChild(backBtn);
+            instructionContainer.appendChild(instructionTextEl);
         }
 
-        backBtn.classList.remove('hidden');
         instructionNext.classList.add('hidden');
         instruction.classList.remove('hidden');
         instructionTextEl.textContent = '';
@@ -413,11 +421,14 @@ class Game {
                 i++;
                 setTimeout(typeNext, speed);
             } else {
+                // Setelah teks selesai, baru tampilkan tombol < BACK
+                backBtn.classList.remove('hidden');
                 instruction.style.pointerEvents = 'auto';
                 backBtn.onclick = () => {
                     instruction.classList.add('hidden');
                     backBtn.classList.add('hidden');
                     instructionTextEl.textContent = '';
+                    instruction.classList.remove('ruang2-instruction');
                     if (typeof callback === 'function') callback();
                 };
                 instruction.onclick = backBtn.onclick;
@@ -430,11 +441,11 @@ class Game {
         // Ganti background ke bedroom.png
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
+            bg.style.backgroundImage = "url('/game/src/assets/images/bedroom.png')";
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
+            gameScreen.style.backgroundImage = "url('/game/src/assets/images/bedroom.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
         // Sembunyikan item ruang1
@@ -479,13 +490,13 @@ class Game {
         // Ganti background ke open.jpg
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('/src/assets/images/open.jpg')";
+            bg.style.backgroundImage = "url('/game/src/assets/images/open.jpg')";
             // Hapus blur (fitur blur dihilangkan)
             bg.style.filter = '';
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('/src/assets/images/open.jpg')";
+            gameScreen.style.backgroundImage = "url('/game/src/assets/images/open.jpg')";
             gameScreen.style.backgroundSize = 'cover';
             // Hapus blur (fitur blur dihilangkan)
             gameScreen.style.filter = '';
@@ -512,11 +523,11 @@ class Game {
         // Ganti background ke win.png
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('/src/assets/images/win.png')";
+            bg.style.backgroundImage = "url('/game/src/assets/images/win.png')";
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('/src/assets/images/win.png')";
+            gameScreen.style.backgroundImage = "url('/game/src/assets/images/win.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
         // Mainkan winn.mp3 (pastikan sudah ada di HTML dengan id="winnSound")
@@ -524,7 +535,7 @@ class Game {
         if (!winnAudio) {
             winnAudio = document.createElement('audio');
             winnAudio.id = 'winnSound';
-            winnAudio.src = '/src/assets/audio/winn.mp3';
+            winnAudio.src = '/game/src/assets/audio/winn.mp3';
             winnAudio.preload = 'auto';
             document.body.appendChild(winnAudio);
         }
@@ -1081,11 +1092,11 @@ function onItemCollected(itemName) {
 function changeBackground(imageName) {
     const bg = document.getElementById('background');
     if (bg) {
-        bg.style.backgroundImage = `url('${imageName}')`;
+        bg.style.backgroundImage = `url('/game/${imageName.replace(/^\/game\//, "")}')`;
     } else {
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = `url('${imageName}')`;
+            gameScreen.style.backgroundImage = `url('/game/${imageName.replace(/^\/game\//, "")}')`;
             gameScreen.style.backgroundSize = 'cover';
         }
     }

@@ -6,7 +6,7 @@
     <meta name="google" content="notranslate">
     <meta http-equiv="Content-Language" content="id">
     <title>Siaga Bersama Dira</title>
-    <link rel="stylesheet" href="/src/css/styles.css">
+    <link rel="stylesheet" href="/game/src/css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
         .mute-btn-game {
@@ -135,6 +135,8 @@
         </div>
         <!-- Win Background -->
         <div class="background win-bg">
+            <!-- Tambahkan tombol mute di win background -->
+            <button id="mute-btn-game-win" class="mute-btn-game hidden" title="Mute/Unmute">🔈</button>
             <div class="win-message" style="display:none;">
                 Alhamdulillah semua barang berhasil diselamatkan!!
             </div>
@@ -143,25 +145,25 @@
     <!-- Audio Container -->
     <div id="audio-container">
         <audio id="bgMusic" loop preload="auto" autoplay>
-            <source src="/src/assets/audio/sea.mp3" type="audio/mp3">
+            <source src="/game/src/assets/audio/sea.mp3" type="audio/mp3">
         </audio>
         <audio id="startGameSound" preload="auto">
-            <source src="/src/assets/audio/game.mp3" type="audio/mp3">
+            <source src="/game/src/assets/audio/game.mp3" type="audio/mp3">
         </audio>
         <audio id="collectSound" preload="auto">
-            <source src="/src/assets/audio/8bit-coin-sound-effect.mp3" type="audio/mp3">
+            <source src="/game/src/assets/audio/8bit-coin-sound-effect.mp3" type="audio/mp3">
         </audio>
         <audio id="winSound" preload="auto">
-            <source src="/src/assets/audio/success-1-6297.mp3" type="audio/mp3">
+            <source src="/game/src/assets/audio/success-1-6297.mp3" type="audio/mp3">
         </audio>
         <audio id="loseSound" preload="auto">
-            <source src="/src/assets/audio/game-over-38511.mp3" type="audio/mp3">
+            <source src="/game/src/assets/audio/game-over-38511.mp3" type="audio/mp3">
         </audio>
     </div>
     <!-- Scripts -->
-    <script type="module" src="/src/js/index.js"></script>
-    <script type="module" src="/src/js/sound.js"></script>
-    <script type="module" src="/src/js/orientation.js"></script>
+    <script type="module" src="/game/src/js/index.js"></script>
+    <script type="module" src="/game/src/js/sound.js"></script>
+    <script type="module" src="/game/src/js/orientation.js"></script>
     <script>
         window.addEventListener('DOMContentLoaded', function() {
             const bgMusic = document.getElementById('bgMusic');
@@ -170,6 +172,7 @@
             const muteBtn = document.getElementById('mute-btn');
             const muteBtnGame = document.getElementById('mute-btn-game');
             const muteBtnGameLose = document.getElementById('mute-btn-game-lose');
+            const muteBtnGameWin = document.getElementById('mute-btn-game-win');
             let isMuted = false;
             function setMute(mute) {
                 isMuted = mute;
@@ -178,9 +181,20 @@
                 document.getElementById('collectSound').muted = isMuted;
                 document.getElementById('winSound').muted = isMuted;
                 document.getElementById('loseSound').muted = isMuted;
+                // Mute/unmute winn.mp3 (jangan pause saat mute)
+                const winnAudio = document.getElementById('winnSound');
+                if (winnAudio) {
+                    winnAudio.muted = isMuted;
+                    // Jika unmute dan sedang di ruang4, play lagi
+                    const winBg = document.querySelector('.background.win-bg');
+                    if (!isMuted && winBg && winBg.style.display === 'block') {
+                        winnAudio.play().catch(()=>{});
+                    }
+                }
                 muteBtn.textContent = isMuted ? '🔇 Unmute' : '🔈 Mute';
                 muteBtnGame.textContent = isMuted ? '🔇' : '🔈';
                 if (muteBtnGameLose) muteBtnGameLose.textContent = isMuted ? '🔇' : '🔈';
+                if (muteBtnGameWin) muteBtnGameWin.textContent = isMuted ? '🔇' : '🔈';
             }
             bgMusic.volume = 0.3;
             bgMusic.play().catch(function(error) {
@@ -202,6 +216,11 @@
                     setMute(!isMuted);
                 });
             }
+            if (muteBtnGameWin) {
+                muteBtnGameWin.addEventListener('click', function() {
+                    setMute(!isMuted);
+                });
+            }
             // Tampilkan/hide mute button sesuai scene
             function showMuteBtnGame(show) {
                 if (muteBtnGame) muteBtnGame.classList.toggle('hidden', !show);
@@ -209,10 +228,14 @@
             function showMuteBtnGameLose(show) {
                 if (muteBtnGameLose) muteBtnGameLose.classList.toggle('hidden', !show);
             }
+            function showMuteBtnGameWin(show) {
+                if (muteBtnGameWin) muteBtnGameWin.classList.toggle('hidden', !show);
+            }
             // Saat masuk game screen, tampilkan mute
             document.getElementById('start-btn').addEventListener('click', function() {
                 showMuteBtnGame(true);
                 showMuteBtnGameLose(false);
+                showMuteBtnGameWin(false);
             });
             // Saat lose background muncul, tampilkan mute di lose
             const loseBg = document.querySelector('.background.lose-bg');
@@ -225,12 +248,44 @@
                 }
             });
             if (loseBg) observerLose.observe(loseBg, { attributes: true, attributeFilter: ['style'] });
+            // Saat win background muncul, pastikan hanya winn.mp3 yang play
+            const winBg = document.querySelector('.background.win-bg');
+            const observerWin = new MutationObserver(() => {
+                if (winBg.style.display === 'block') {
+                    showMuteBtnGame(false);
+                    showMuteBtnGameLose(false);
+                    showMuteBtnGameWin(true);
+                    // Matikan semua sound lain
+                    ['bgMusic', 'startGameSound', 'collectSound', 'winSound', 'loseSound'].forEach(id => {
+                        const audio = document.getElementById(id);
+                        if (audio) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                        }
+                    });
+                    // Atur mute dan play winn.mp3 sesuai status mute
+                    const winnAudio = document.getElementById('winnSound');
+                    if (winnAudio) {
+                        winnAudio.muted = isMuted;
+                        if (!isMuted) {
+                            winnAudio.play().catch(()=>{});
+                        } else {
+                            winnAudio.pause();
+                            winnAudio.currentTime = 0;
+                        }
+                    }
+                } else {
+                    showMuteBtnGameWin(false);
+                }
+            });
+            if (winBg) observerWin.observe(winBg, { attributes: true, attributeFilter: ['style'] });
             // Saat game screen kembali, tampilkan mute di game
             const gameScreen = document.getElementById('game-screen');
             const observerGame = new MutationObserver(() => {
                 if (!gameScreen.classList.contains('hidden')) {
                     showMuteBtnGame(true);
                     showMuteBtnGameLose(false);
+                    showMuteBtnGameWin(false);
                 } else {
                     showMuteBtnGame(false);
                 }
