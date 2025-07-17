@@ -2,7 +2,7 @@ import soundManager from './sound.js';
 
 function checkLandscape() {
     const warning = document.getElementById('landscape-warning');
-    const isMobile = isMobileDevice(); // Ganti deteksi mobile
+    const isMobile = isMobileDevice();
     const isPortrait = window.innerWidth < window.innerHeight;
     if (isMobile && isPortrait) {
         warning?.classList.remove('hidden');
@@ -41,7 +41,6 @@ function checkReturnFromRoom2() {
     const returnedFromRoom2 = sessionStorage.getItem('returnedFromRoom2');
     if (returnedFromRoom2 === 'true') {
         document.querySelector('.hud')?.classList.add('hidden');
-       
         document.querySelectorAll('.item-hidden').forEach(item => {
             item.style.display = 'none';
         });
@@ -120,22 +119,18 @@ class Game {
             inventoryItem.classList.add('found');
         }
         soundManager.play('collect');
-        // --- FIX: cek area dan item ruang1 ---
         if (
             this.areas[this.currentArea] === 'ruang1' &&
             document.querySelectorAll('.item-ruang1:not(.found)').length === 0
         ) {
-            // Semua barang ruang 1 sudah dikumpulkan, tampilkan instruksi dulu, lalu langsung ke ruang 2 tanpa animasi slide kanan
             this.isRunning = false;
             setTimeout(() => {
-                // --- PATCH: pastikan callback instruksi ruang 1 tidak tertimpa onclick lain ---
                 let handled = false;
                 const afterInstruksi = () => {
                     if (handled) return;
                     handled = true;
                     showRoomTransition(() => this.gotoRuang2());
                 };
-                // Gunakan instruksi dengan tombol next (default)
                 this.showTypingInstruction(
                     'alhamdulilah barang di ruang tamu sudah berhasil dikumpulkan! Sekarang ke kamar untuk mengambil barang yang lainya',
                     60,
@@ -143,7 +138,6 @@ class Game {
                     false,
                     afterInstruksi
                 );
-                // Jaga-jaga: pastikan instruksi hanya bisa di-klik sekali
                 const instruction = document.getElementById('instruction');
                 const instructionNext = document.getElementById('instruction-next');
                 if (instruction && instructionNext) {
@@ -153,7 +147,6 @@ class Game {
             }, 350);
             return;
         }
-        // Ruang 2: instruksi + tombol <back, lanjut ke ruang 3
         if (
             this.areas[this.currentArea] === 'ruang2' &&
             document.querySelectorAll('.item-ruang2:not(.found)').length === 0
@@ -170,7 +163,6 @@ class Game {
             }, 350);
             return;
         }
-        // Ruang 3: setelah semua barang diambil, tampilkan instruksi <back di tengah
         if (
             this.areas[this.currentArea] === 'ruang3' &&
             document.querySelectorAll('.item-ruang3:not(.found)').length === 0
@@ -185,19 +177,14 @@ class Game {
         }
     }
 
-    // Instruksi hanya <back di tengah layar (khusus ruang 3 & ruang 4, bisa dengan pesan custom)
     showBackOnlyInstruction(callback = null, message = null) {
         const instruction = document.getElementById('instruction');
         const instructionContainer = document.querySelector('.instruction-container');
         const instructionTextEl = document.getElementById('instruction-text');
         const instructionNext = document.getElementById('instruction-next');
-
-        // Bersihkan isi container
         if (instructionTextEl) instructionTextEl.textContent = '';
         if (instructionNext) instructionNext.classList.add('hidden');
         if (instructionContainer) instructionContainer.innerHTML = '';
-
-        // Buat tombol <back di tengah
         let backBtn = document.getElementById('back-instruksi');
         if (!backBtn) {
             backBtn = document.createElement('span');
@@ -214,8 +201,6 @@ class Game {
         backBtn.style.display = 'inline-block';
         backBtn.style.margin = '0 auto';
         backBtn.style.textAlign = 'center';
-
-        // Pesan custom di atas tombol jika ada
         if (instructionContainer) {
             instructionContainer.style.justifyContent = 'center';
             instructionContainer.style.alignItems = 'center';
@@ -232,10 +217,8 @@ class Game {
             }
             instructionContainer.appendChild(backBtn);
         }
-
         instruction.classList.remove('hidden');
         instruction.style.pointerEvents = 'auto';
-
         backBtn.onclick = () => {
             instruction.classList.add('hidden');
             backBtn.classList.add('hidden');
@@ -245,32 +228,24 @@ class Game {
         backBtn.classList.remove('hidden');
     }
 
-    // Instruksi hanya <back di tengah layar (khusus ruang 3 & ruang 4, bisa dengan pesan custom dan tombol custom)
     showBackOnlyInstruction(callback = null, message = null, buttonText = null, ruang4Clean = false, verticalLayout = false) {
         const instruction = document.getElementById('instruction');
         const instructionContainer = document.querySelector('.instruction-container');
         const instructionTextEl = document.getElementById('instruction-text');
         const instructionNext = document.getElementById('instruction-next');
-
-        // Bersihkan isi container
         if (instructionTextEl) instructionTextEl.textContent = '';
         if (instructionNext) instructionNext.classList.add('hidden');
         if (instructionContainer) instructionContainer.innerHTML = '';
-
-        // Gunakan class untuk mengatur background instruksi
         if (ruang4Clean && instruction) {
             instruction.classList.add('ruang4-clear-bg');
         } else if (instruction) {
             instruction.classList.remove('ruang4-clear-bg');
         }
-
-        // Atur layout atas-bawah jika verticalLayout true
         if (instructionContainer && verticalLayout) {
             instructionContainer.style.flexDirection = 'column';
             instructionContainer.style.justifyContent = 'center';
             instructionContainer.style.alignItems = 'center';
             instructionContainer.innerHTML = '';
-
             if (message) {
                 const msg = document.createElement('div');
                 msg.style.textAlign = 'center';
@@ -281,7 +256,6 @@ class Game {
                 msg.textContent = message;
                 instructionContainer.appendChild(msg);
             }
-
             if (buttonText) {
                 let backBtn = document.getElementById('back-instruksi');
                 if (!backBtn) {
@@ -299,16 +273,12 @@ class Game {
                 backBtn.style.display = 'block';
                 backBtn.style.margin = '0 auto';
                 backBtn.style.textAlign = 'center';
-
                 instructionContainer.appendChild(backBtn);
-
                 instruction.classList.remove('hidden');
                 instruction.style.pointerEvents = 'auto';
-
                 backBtn.onclick = () => {
                     instruction.classList.add('hidden');
                     backBtn.classList.add('hidden');
-                    // Hilangkan overlay gelap jika ada
                     let overlay = document.getElementById('win-dark-overlay');
                     if (overlay) overlay.style.display = 'none';
                     if (typeof callback === 'function') callback();
@@ -317,14 +287,11 @@ class Game {
                 backBtn.classList.remove('hidden');
                 return;
             } else {
-                // Hanya pesan saja, tanpa tombol
                 instruction.classList.remove('hidden');
                 instruction.style.pointerEvents = 'none';
                 return;
             }
         }
-
-        // Default: pesan di atas, tombol di bawah (atau inline)
         let backBtn = document.getElementById('back-instruksi');
         if (!backBtn) {
             backBtn = document.createElement('span');
@@ -341,7 +308,6 @@ class Game {
         backBtn.style.display = 'inline-block';
         backBtn.style.margin = '0 auto';
         backBtn.style.textAlign = 'center';
-
         if (instructionContainer) {
             instructionContainer.style.flexDirection = '';
             instructionContainer.style.justifyContent = 'center';
@@ -359,10 +325,8 @@ class Game {
             }
             instructionContainer.appendChild(backBtn);
         }
-
         instruction.classList.remove('hidden');
         instruction.style.pointerEvents = 'auto';
-
         backBtn.onclick = () => {
             instruction.classList.add('hidden');
             backBtn.classList.add('hidden');
@@ -372,17 +336,12 @@ class Game {
         backBtn.classList.remove('hidden');
     }
 
-    // Instruksi dengan tombol "<back" di kiri instruksi
     showTypingInstructionWithBack(text, speed = 80, callback = null) {
         const instruction = document.getElementById('instruction');
         const instructionTextEl = document.getElementById('instruction-text');
         const instructionNext = document.getElementById('instruction-next');
         const instructionContainer = document.querySelector('.instruction-container');
-
-        // Tambahkan class khusus ruang2 agar bisa di-style di CSS
         instruction.classList.add('ruang2-instruction');
-
-        // Buat elemen tombol < BACK
         let backBtn = document.getElementById('back-instruksi');
         if (!backBtn) {
             backBtn = document.createElement('span');
@@ -398,9 +357,7 @@ class Game {
         backBtn.style.color = '#ffd700';
         backBtn.style.marginRight = '10px';
         backBtn.style.marginBottom = '0';
-        backBtn.classList.add('hidden'); // Sembunyikan dulu
-
-        // Pastikan backBtn di kiri (sebelum instructionText)
+        backBtn.classList.add('hidden');
         if (instructionContainer) {
             instructionContainer.innerHTML = '';
             instructionContainer.style.flexDirection = 'row';
@@ -408,12 +365,10 @@ class Game {
             instructionContainer.appendChild(backBtn);
             instructionContainer.appendChild(instructionTextEl);
         }
-
         instructionNext.classList.add('hidden');
         instruction.classList.remove('hidden');
         instructionTextEl.textContent = '';
         instruction.style.pointerEvents = 'none';
-
         let i = 0;
         const typeNext = () => {
             if (i < text.length) {
@@ -421,7 +376,6 @@ class Game {
                 i++;
                 setTimeout(typeNext, speed);
             } else {
-                // Setelah teks selesai, baru tampilkan tombol < BACK
                 backBtn.classList.remove('hidden');
                 instruction.style.pointerEvents = 'auto';
                 backBtn.onclick = () => {
@@ -438,7 +392,6 @@ class Game {
     }
 
     gotoRuang2() {
-        // Ganti background ke bedroom.png
         const bg = document.getElementById('background');
         if (bg) {
             bg.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
@@ -448,13 +401,11 @@ class Game {
             gameScreen.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
-        // Sembunyikan item ruang1
         document.querySelectorAll('.item-ruang1').forEach(item => {
             item.classList.add('hidden');
             item.style.display = 'none';
         });
         document.getElementById('items-container-ruang1')?.classList.add('hidden');
-        // Tampilkan dan aktifkan item ruang2
         document.querySelectorAll('.item-ruang2').forEach(item => {
             item.classList.remove('hidden');
             item.style.display = 'block';
@@ -462,7 +413,6 @@ class Game {
         });
         document.getElementById('items-container-ruang2')?.classList.remove('hidden');
         this.currentArea = 1;
-        // Bind event agar item ruang2 bisa diklik/dikumpulkan
         document.querySelectorAll('.item-ruang2').forEach(item => {
             const newItem = item.cloneNode(true);
             item.parentNode.replaceChild(newItem, item);
@@ -471,23 +421,18 @@ class Game {
             newItem.classList.remove('hidden');
             newItem.addEventListener('click', () => this.collectItem(newItem));
         });
-        // Timer tetap dilanjutkan dari ruang 1, tidak di-reset
         document.querySelector('#timer span').textContent = Math.ceil(this.timeLeft);
         this.timerStarted = true;
         this.isRunning = true;
         this.startTimer();
     }
     
-    // Tambahkan metode baru untuk ruang3 sederhana
     gotoRuang3Simple() {
-        // Sembunyikan semua elemen game utama
         document.querySelectorAll('.item-ruang1, .item-ruang2, .hud, #items-container-ruang1, #items-container-ruang2, #items-container-ruang3, #area-navigation, #character').forEach(el => {
             el.classList.add('hidden');
             if (el.style) el.style.display = 'none';
         });
-        // Tampilkan background ruang3
         document.getElementById('ruang3-bg')?.classList.remove('hidden');
-        // Ganti background ke open.jpg
         const bg = document.getElementById('background');
         if (bg) {
             bg.style.backgroundImage = "url('/src/assets/images/open.jpg')";
@@ -499,12 +444,9 @@ class Game {
             gameScreen.style.backgroundSize = 'cover';
             gameScreen.style.filter = '';
         }
-        // Tidak ada item, tidak ada HUD, hanya instruksi <back di tengah
         this.currentArea = 2;
         this.isRunning = false;
         this.timerStarted = false;
-
-        // Tampilkan instruksi <back di ruang 3 dengan delay sedikit (misal 1200ms)
         setTimeout(() => {
             this.showBackOnlyInstruction(() => {
                 this.gotoRuang4Win();
@@ -513,12 +455,10 @@ class Game {
     }
 
     gotoRuang4Win() {
-        // Sembunyikan semua elemen game utama
         document.querySelectorAll('.item-ruang1, .item-ruang2, .item-ruang3, .hud, #items-container-ruang1, #items-container-ruang2, #items-container-ruang3, #area-navigation, #character').forEach(el => {
             el.classList.add('hidden');
             if (el.style) el.style.display = 'none';
         });
-        // Ganti background ke win.png
         const bg = document.getElementById('background');
         if (bg) {
             bg.style.backgroundImage = "url('/src/assets/images/win.png')";
@@ -528,7 +468,6 @@ class Game {
             gameScreen.style.backgroundImage = "url('/src/assets/images/win.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
-        // Mainkan winn.mp3 (pastikan sudah ada di HTML dengan id="winnSound")
         let winnAudio = document.getElementById('winnSound');
         if (!winnAudio) {
             winnAudio = document.createElement('audio');
@@ -545,22 +484,18 @@ class Game {
         } catch (e) {
             winDelay = 1200;
         }
-
         setTimeout(() => {
             this.showBackOnlyInstruction(
                 null,
                 'Alhamdulillah semua barang berhasil diselamatkan!!',
                 null,
-                true, // ruang4Clean
-                true  // verticalLayout
+                true,
+                true
             );
-            // Setelah sound selesai, munculkan instruksi "AYO MAINKAN LAGI😊" dengan animasi menarik
             const showMainLagi = () => {
                 this.showBackOnlyInstruction(() => {
                     window.location.reload();
                 }, 'Alhamdulillah semua barang berhasil diselamatkan!!', 'AYO MAINKAN LAGI😊', false, true);
-
-                // Tambahkan animasi pada tombol "AYO MAINKAN LAGI😊"
                 setTimeout(() => {
                     const backBtn = document.getElementById('back-instruksi');
                     if (backBtn) {
@@ -570,7 +505,6 @@ class Game {
                         setTimeout(() => {
                             backBtn.style.opacity = '1';
                             backBtn.style.transform = 'scale(1) rotate(0deg)';
-                            // Tambahkan efek bounce
                             backBtn.classList.add('main-lagi-bounce');
                             setTimeout(() => {
                                 backBtn.classList.remove('main-lagi-bounce');
@@ -602,7 +536,6 @@ class Game {
         if (!instruction || !instructionTextEl || !roomArrow || !instructionNext) return;
         instruction.classList.remove('hidden');
         instructionTextEl.textContent = '';
-        // Arrow custom: gunakan SVG inline agar lebih "game" dan modern
         roomArrow.innerHTML = `
         <svg width="48" height="48" viewBox="0 0 48 48" style="vertical-align:middle;">
             <circle cx="24" cy="24" r="22" fill="#27ae60" stroke="#fff" stroke-width="3"/>
@@ -654,17 +587,14 @@ class Game {
         const instructionTextEl = document.getElementById('instruction-text');
         const instructionNext = document.getElementById('instruction-next');
         if (!instruction || !instructionTextEl || !instructionNext) return;
-        
         if (this.typingTimeout) {
             clearTimeout(this.typingTimeout);
             this.typingTimeout = null;
         }
-        
         instruction.classList.remove('hidden');
         instructionTextEl.textContent = '';
         instructionNext.classList.add('hidden');
         instruction.style.pointerEvents = 'none';
-        
         let i = 0;
         const typeNext = () => {
             if (i < text.length) {
@@ -712,9 +642,9 @@ class Game {
     showBadaiInstruction() {
         if (this.instructionShown) return;
         this.instructionShown = true;
-        this.isRunning = false; // Pause timer when instruction is shown
+        this.isRunning = false;
         this.timerStarted = false;
-        document.querySelector('#timer span').textContent = '30'; // Ubah dari 60 ke 30
+        document.querySelector('#timer span').textContent = '30';
         document.querySelectorAll('.item-hidden').forEach(item => {
             item.style.pointerEvents = 'none';
         });
@@ -823,7 +753,7 @@ const audioManager = {
     backgroundMusic: null,
     init() {
         this.backgroundMusic = document.getElementById('bgMusic');
-        if (this.backgroundMusic) { // <-- perbaiki typo: tambahkan tanda kurung
+        if (this.backgroundMusic) {
             this.backgroundMusic.volume = 0.3;
         }
     },
@@ -849,16 +779,13 @@ function forceFullscreen() {
     }
 }
 
-// Fungsi deteksi orientasi yang lebih akurat
 function isPortrait() {
-    // Gunakan matchMedia jika tersedia, fallback ke perbandingan width/height
     if (window.matchMedia) {
         return window.matchMedia("(orientation: portrait)").matches;
     }
     return window.innerHeight > window.innerWidth;
 }
 
-// Fungsi deteksi mobile
 function isMobileDevice() {
     return (
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
@@ -866,10 +793,7 @@ function isMobileDevice() {
     );
 }
 
-// Perbaiki checkOrientation agar lebih konsisten
 function checkOrientation() {
-    // Debug log
-    console.log('checkOrientation called');
     const warning = document.getElementById('orientation-warning');
     const landscapeWarning = document.getElementById('landscape-warning');
     const startScreen = document.getElementById('start-screen');
@@ -881,16 +805,13 @@ function checkOrientation() {
         window.__hasStartedGame = false;
     }
     if (mobile && portrait) {
-        // Tampilkan warning landscape
         if (warning) warning.classList.remove('hidden');
         if (landscapeWarning) landscapeWarning.classList.remove('hidden');
         if (startScreen) startScreen.style.visibility = 'hidden';
         if (gameScreen) gameScreen.style.visibility = 'hidden';
         if (endScreen) endScreen.style.visibility = 'hidden';
         document.body.style.overflow = 'hidden';
-        console.log('Mobile portrait: show landscape warning');
     } else {
-        // Sembunyikan warning landscape
         if (warning) warning.classList.add('hidden');
         if (landscapeWarning) landscapeWarning.classList.add('hidden');
         if (!window.__hasStartedGame) {
@@ -908,17 +829,14 @@ function checkOrientation() {
             else if (endScreen) endScreen.style.visibility = 'hidden';
         }
         document.body.style.overflow = '';
-        console.log('Landscape or desktop: hide landscape warning');
     }
 }
 
-// Ubah fungsi handleOrientationWarning
 export function handleOrientationWarning() {
     const orientationWarning = document.getElementById('orientation-warning');
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
-    // Ganti deteksi mobile
     const isMobile = isMobileDevice();
     const isPortrait = window.innerWidth < window.innerHeight;
     if (typeof window.__hasStartedGame === 'undefined') {
@@ -982,7 +900,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     });
     window.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded event');
         checkOrientation();
     });
     window.addEventListener('resize', checkOrientation);
@@ -1063,12 +980,7 @@ function showWinBackground() {
     }
 }
 
-// ====== Tambahan dari main.js ======
-
-// Fungsi untuk mengecek apakah semua item ruang1 sudah dikumpulkan
 function checkAllItemsCollected() {
-    // Misal itemsRuang1 adalah array nama item di ruang1
-    // collectedItems adalah array nama item yang sudah dikumpulkan
     if (typeof itemsRuang1 !== 'undefined' && typeof collectedItems !== 'undefined') {
         if (itemsRuang1.every(item => collectedItems.includes(item))) {
             changeBackground('assets/images/bedroom.png');
@@ -1076,17 +988,13 @@ function checkAllItemsCollected() {
     }
 }
 
-// Fungsi yang dipanggil setiap kali item dikumpulkan
 function onItemCollected(itemName) {
-    // ...existing code...
     if (typeof collectedItems !== 'undefined') {
         collectedItems.push(itemName);
         checkAllItemsCollected();
     }
-    // ...existing code...
 }
 
-// Fungsi untuk mengganti background
 function changeBackground(imageName) {
     const bg = document.getElementById('background');
     if (bg) {
@@ -1115,7 +1023,6 @@ function showRoomTransition(callback) {
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 700);
-        }, 400); // waktu overlay tetap hitam sebelum fade out
-    }, 700); // waktu fade in
-
+        }, 400);
+    }, 700);
 }
