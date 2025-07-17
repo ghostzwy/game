@@ -441,11 +441,11 @@ class Game {
         // Ganti background ke bedroom.png
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('src/assets/images/bedroom.png')";
+            bg.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('src/assets/images/bedroom.png')";
+            gameScreen.style.backgroundImage = "url('/src/assets/images/bedroom.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
         // Sembunyikan item ruang1
@@ -490,12 +490,12 @@ class Game {
         // Ganti background ke open.jpg
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('src/assets/images/open.jpg')";
+            bg.style.backgroundImage = "url('/src/assets/images/open.jpg')";
             bg.style.filter = '';
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('src/assets/images/open.jpg')";
+            gameScreen.style.backgroundImage = "url('/src/assets/images/open.jpg')";
             gameScreen.style.backgroundSize = 'cover';
             gameScreen.style.filter = '';
         }
@@ -521,11 +521,11 @@ class Game {
         // Ganti background ke win.png
         const bg = document.getElementById('background');
         if (bg) {
-            bg.style.backgroundImage = "url('src/assets/images/win.png')";
+            bg.style.backgroundImage = "url('/src/assets/images/win.png')";
         }
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = "url('src/assets/images/win.png')";
+            gameScreen.style.backgroundImage = "url('/src/assets/images/win.png')";
             gameScreen.style.backgroundSize = 'cover';
         }
         // Mainkan winn.mp3 (pastikan sudah ada di HTML dengan id="winnSound")
@@ -533,7 +533,7 @@ class Game {
         if (!winnAudio) {
             winnAudio = document.createElement('audio');
             winnAudio.id = 'winnSound';
-            winnAudio.src = 'src/assets/audio/winn.mp3';
+            winnAudio.src = '/src/assets/audio/winn.mp3';
             winnAudio.preload = 'auto';
             document.body.appendChild(winnAudio);
         }
@@ -1090,11 +1090,11 @@ function onItemCollected(itemName) {
 function changeBackground(imageName) {
     const bg = document.getElementById('background');
     if (bg) {
-        bg.style.backgroundImage = `url('src/${imageName.replace(/^src\//, "")}')`;
+        bg.style.backgroundImage = `url('/src/${imageName.replace(/^src\//, "")}')`;
     } else {
         const gameScreen = document.getElementById('game-screen');
         if (gameScreen) {
-            gameScreen.style.backgroundImage = `url('src/${imageName.replace(/^src\//, "")}')`;
+            gameScreen.style.backgroundImage = `url('/src/${imageName.replace(/^src\//, "")}')`;
             gameScreen.style.backgroundSize = 'cover';
         }
     }
