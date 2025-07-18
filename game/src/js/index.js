@@ -132,7 +132,7 @@ class Game {
                     showRoomTransition(() => this.gotoRuang2());
                 };
                 this.showTypingInstruction(
-                    'alhamdulilah barang di ruang tamu sudah berhasil dikumpulkan! Sekarang ke kamar untuk mengambil barang yang lainya',
+                    'akhirnya barang di ruang tamu sudah berhasil dikumpulkan! Sekarang ke kamar untuk mengambil barang yang lainya',
                     60,
                     false,
                     false,
